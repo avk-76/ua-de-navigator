@@ -583,6 +583,22 @@
     ["Проверьте сайт ведомства, указанного в письме.", "Перевірте сайт установи, зазначеної в листі.", "Prüfen Sie die im Schreiben genannte Behördenseite.", "Check the authority site named in the letter."],
     ["подтверждённых сроков", "підтверджених строків", "bestätigte Fristen", "confirmed deadlines"],
     ["Дела с документами", "Справи з документами", "Fälle mit Dokumenten", "Cases with documents"],
+    ["Номер дела не указан", "Номер справи не вказано", "Kein Aktenzeichen angegeben", "No reference number provided"],
+    ["Для этого дела пока нет чек-листа.", "Для цієї справи поки немає списку підготовки.", "Für diesen Fall gibt es noch keine Checkliste.", "There is no checklist for this case yet."],
+    ["Срок не подтверждён", "Строк не підтверджено", "Frist nicht bestätigt", "Deadline not confirmed"],
+    ["срок подтверждён пользователем", "строк підтверджено користувачем", "Frist von Ihnen bestätigt", "Deadline confirmed by you"],
+    ["проверьте дату в оригинале письма", "перевірте дату в оригіналі листа", "Datum im Originalschreiben prüfen", "Check the date in the original letter"],
+    ["История пока пуста", "Історія поки порожня", "Noch kein Verlauf", "No history yet"],
+    ["События появятся после добавления документа.", "Події з'являться після додавання документа.", "Ereignisse erscheinen, sobald Sie ein Dokument hinzufügen.", "Events will appear after a document is added."],
+    ["Чек-лист появится после анализа письма.", "Список підготовки з'явиться після аналізу листа.", "Die Checkliste erscheint nach der Analyse des Schreibens.", "The checklist will appear after the letter is analyzed."],
+    ["Фильтры документов", "Фільтри документів", "Dokumentfilter", "Document filters"],
+    ["Открыть документ →", "Відкрити документ →", "Dokument öffnen →", "Open document →"],
+    ["Мы нашли возможный срок. Проверьте фрагмент оригинала:", "Ми знайшли можливий строк. Перевірте уривок оригіналу:", "Wir haben eine mögliche Frist gefunden. Prüfen Sie den Originalauszug:", "We found a possible deadline. Check the original excerpt:"],
+    ["Фрагмент не сохранён", "Уривок не збережено", "Auszug nicht gespeichert", "Excerpt not saved"],
+    ["Подтвердить срок", "Підтвердити строк", "Frist bestätigen", "Confirm deadline"],
+    ["Подтверждения отправки", "Підтвердження відправлення", "Versandnachweise", "Sending receipts"],
+    ["Номер или место подтверждения", "Номер або місце підтвердження", "Nummer oder Ablageort des Nachweises", "Receipt number or location"],
+    ["Необязательно: квитанция, PDF, номер", "Необов'язково: квитанція, PDF, номер", "Optional: Quittung, PDF, Nummer", "Optional: receipt, PDF, number"],
   ];
 
   const languages = ["ru", "uk", "de", "en"];

@@ -73,6 +73,11 @@ class CaseEngineFlowTest(unittest.TestCase):
         self.assertEqual(answer["topic"], "housing")
         self.assertIn("персональный маршрут", answer["steps"][0])
         self.assertIn("Сколько лет ребёнку", answer["clarifying_questions"][2])
+        german = answer_guest_question("Aus der Ukraine mit Kind und ohne Wohnung", [], "de")
+        self.assertEqual(german["topic"], "housing")
+        self.assertIn("Unterkunft", german["summary"])
+        self.assertIn("Ausweise", german["documents"][0])
+        self.assertNotIn("Это ориентир", german["caution"])
 
     def test_document_to_case_to_waiting_to_followup(self):
         with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parent) as folder:

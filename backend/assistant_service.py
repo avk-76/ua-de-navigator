@@ -163,6 +163,12 @@ def answer_guest_question(
         }.get(language, {})
         answer = {**topic_answers[topic], "summary": special.get("summary", topic_answers[topic]["summary"]),
                   "steps": special.get("steps", topic_answers[topic]["steps"])}
+        answer["documents"] = {
+            "ru": ["Паспорта взрослого и ребёнка", "Подтверждение родства или опеки", "Сведения о возможном размещении"],
+            "uk": ["Паспорти дорослого й дитини", "Підтвердження спорідненості або опіки", "Відомості про можливе розміщення"],
+            "de": ["Ausweise von Erwachsenem und Kind", "Nachweis zu Verwandtschaft oder Sorgerecht", "Angaben zu einer möglichen Unterkunft"],
+            "en": ["Identity documents for adult and child", "Proof of relationship or custody", "Details of possible accommodation"],
+        }.get(language, topic_answers[topic]["documents"])
         clarifying_questions = special.get("questions", [])
     else:
         clarifying_questions = [
@@ -178,10 +184,12 @@ def answer_guest_question(
         "summary": answer["summary"],
         "steps": answer["steps"],
         "documents": answer["documents"],
-        "caution": (
-            "Это ориентир для следующего шага, а не решение ведомства и не юридическое заключение. "
-            "Для окончательного ответа нужны факты вашей ситуации и актуальная проверка правил."
-        ),
+        "caution": {
+            "ru": "Это ориентир для следующего шага, а не решение ведомства и не юридическое заключение. Для окончательного ответа нужны факты вашей ситуации и актуальная проверка правил.",
+            "uk": "Це орієнтир для наступного кроку, а не рішення установи чи юридичний висновок. Для остаточної відповіді потрібні факти вашої ситуації та актуальна перевірка правил.",
+            "de": "Dies ist eine Orientierung für den nächsten Schritt, keine Behördenentscheidung oder Rechtsberatung. Für eine abschließende Antwort müssen Ihre Angaben und die aktuellen Regeln geprüft werden.",
+            "en": "This guides your next step; it is not an authority decision or legal opinion. A final answer requires your specific facts and a check of current rules.",
+        }.get(language, "Это ориентир для следующего шага, а не решение ведомства и не юридическое заключение."),
         "clarifying_questions": clarifying_questions,
         "sources": _relevant_sources(sources, topic),
     }
