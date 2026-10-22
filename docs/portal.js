@@ -564,10 +564,15 @@ function renderCaseDocuments(documents) {
   });
   container.innerHTML = visible.length ? visible.map((item) => {
     const analysis = item.analysis_json || {};
-    const required = (analysis.required_documents || []).join(", ");
+    const onlyLetterInCase = documents.filter(isLetter).length === 1;
+    const caseChecklist = onlyLetterInCase && isLetter(item)
+      ? (portalState.activeCase?.checklist || []).map((entry) => entry.title) : [];
+    const required = (analysis.required_documents?.length ? analysis.required_documents : caseChecklist)
+      .map((title) => portalText(title)).join(", ");
     const recordedDeadline = (portalState.activeCase?.deadlines || []).find((deadline) => deadline.document_id === item.id);
     const due = recordedDeadline?.due_at || analysis.deadline?.extracted_due_at;
-    const requirement = Object.values(analysis.requirement_sources || {})[0] || analysis.document_type || item.document_type || "—";
+    const requirement = Object.values(analysis.requirement_sources || {})[0] || analysis.document_type ||
+      (item.document_type === "request_missing_documents" ? "Запрошены дополнительные документы — сверьте формулировку с письмом" : "—");
     return `
       <details class="case-file" data-case-document-id="${escapePortalHtml(item.id)}">
         <summary><span class="file-type">${escapePortalHtml(fileType(item.file_name))}</span>

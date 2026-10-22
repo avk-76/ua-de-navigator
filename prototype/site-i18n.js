@@ -557,6 +557,7 @@
     ["← Кабинет", "← Кабінет", "← Dashboard", "← Dashboard"],
     ["Номер или место подтверждения", "Номер або місце підтвердження", "Nummer oder Ablageort des Nachweises", "Receipt number or location"],
     ["Необязательно: квитанция, PDF, номер", "Необов'язково: квитанція, PDF, номер", "Optional: Quittung, PDF, Nummer", "Optional: receipt, PDF, number"],
+    ["Запрошены дополнительные документы — сверьте формулировку с письмом", "Запитано додаткові документи — звірте формулювання з листом", "Zusätzliche Unterlagen angefordert – Wortlaut im Schreiben prüfen", "Additional documents requested – check the exact wording in the letter"],
     ["Подтверждения отправки", "Підтвердження надсилання", "Versandnachweise", "Sending records"],
     ["Подготовить ответ", "Підготувати відповідь", "Antwort vorbereiten", "Prepare a reply"],
     ["Отметьте только документы, которые действительно готовы. Черновик можно проверить и изменить перед отправкой.", "Позначте лише документи, які справді готові. Чернетку можна перевірити й змінити перед відправленням.", "Markieren Sie nur tatsächlich vorhandene Unterlagen. Den Entwurf können Sie vor dem Senden prüfen und ändern.", "Select only documents you actually have. Review and edit the draft before sending."],

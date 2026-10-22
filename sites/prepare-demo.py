@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -58,9 +59,11 @@ def main() -> None:
         '<link rel="stylesheet" href="./onboarding.css" />',
         '<link rel="stylesheet" href="./onboarding.css" />\n    <link rel="stylesheet" href="./demo.css" />',
     )
-    html = html.replace(
-        '<script src="./portal.js"></script>',
-        '<script src="./demo-api.js"></script>\n    <script src="./portal.js"></script>',
+    html = re.sub(
+        r'(<script src="\./portal\.js(?:\?[^\"]*)?"></script>)',
+        r'<script src="./demo-api.js"></script>\n    \1',
+        html,
+        count=1,
     )
     index_path.write_text(html, encoding="utf-8")
 
