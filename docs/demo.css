@@ -1,0 +1,13 @@
+.demo-banner {
+  position: relative;
+  z-index: 30;
+  margin: 0 0 1rem;
+  padding: .8rem 1rem;
+  border: 1px solid rgba(91, 173, 170, .45);
+  border-radius: 12px;
+  background: #123039;
+  color: #f0f8f7;
+  font: 500 .9rem/1.45 system-ui, sans-serif;
+}
+.demo-banner strong { color: #94e0d4; }
+#leadCapture, #guestLeadCapture, #welcomeCredits { display: none !important; }

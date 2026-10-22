@@ -1,0 +1,1300 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080b0c" />
+    <title>UA-DE Navigator — следующий шаг без бюрократического шума</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./portal.css" />
+    <link rel="stylesheet" href="./onboarding.css" />
+    <link rel="stylesheet" href="./demo.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="app-shell">
+      <section class="workspace">
+        <header class="topbar">
+          <button class="brand brand-button" type="button" data-route="welcome" aria-label="Открыть начало маршрута">
+            <span class="brand-mark">N</span>
+            <span>UA—DE Navigator</span>
+          </button>
+
+          <nav class="quiet-nav" aria-label="Основная навигация">
+            <button type="button" data-route="welcome">Маршрут</button>
+            <button type="button" data-route="home">Кабинет</button>
+            <button type="button" data-route="cases" data-i18n="navCases">Мои дела</button>
+            <button type="button" data-route="deadlines" data-i18n="navDeadlines">Сроки</button>
+            <button type="button" data-route="profile">Профиль</button>
+          </nav>
+
+          <label class="language-switch">
+            <span class="sr-only" data-i18n="interfaceLanguage">Язык интерфейса</span>
+            <select id="languageSelect" aria-label="Язык интерфейса">
+              <option value="ru">RU</option>
+              <option value="uk">UA</option>
+              <option value="de">DE</option>
+              <option value="en">EN</option>
+            </select>
+          </label>
+        </header>
+
+        <section class="app-view is-active onboarding-view" data-view="welcome">
+          <header class="onboarding-hero">
+            <div class="onboarding-hero-copy">
+              <p class="section-label">ВАШ ПЕРВЫЙ ПОНЯТНЫЙ ШАГ В ГЕРМАНИИ</p>
+              <h1>Переезд без хаоса. Маршрут — именно под вашу ситуацию.</h1>
+              <p>
+                Ответьте на несколько вопросов. Мы определим, с чего начать, куда обращаться
+                и какие возможности не упустить. Регистрация понадобится только после того,
+                как вы увидите свой результат.
+              </p>
+              <div class="hero-actions">
+                <button class="primary-button" type="button" data-start-route>
+                  <span>Получить мой маршрут</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+                <button class="secondary-button" type="button" data-route="home">Уже есть кабинет</button>
+              </div>
+              <div class="onboarding-trust-row">
+                <span>5–7 минут</span>
+                <span>Без регистрации до результата</span>
+                <span>Актуальные официальные источники</span>
+              </div>
+            </div>
+            <aside class="onboarding-hero-aside welcome-pack-preview">
+              <p class="section-label">БЕСПЛАТНЫЙ СТАРТОВЫЙ ПАКЕТ</p>
+              <div class="welcome-pack-number">
+                <strong>3</strong>
+                <span>разбора писем и документов<br />первый — до регистрации</span>
+              </div>
+              <div class="welcome-pack-number">
+                <strong>5</strong>
+                <span>персональных ответов<br />первый — прямо сейчас</span>
+              </div>
+              <p class="welcome-pack-note">Первую помощь можно проверить без регистрации. Остальное сохранится в бесплатном кабинете.</p>
+            </aside>
+          </header>
+
+          <section class="entry-paths" aria-labelledby="entryPathsTitle">
+            <div class="landing-section-head">
+              <div>
+                <p class="section-label">ВЫБЕРИТЕ СВОЮ СИТУАЦИЮ</p>
+                <h2 id="entryPathsTitle">С чего вам удобнее начать?</h2>
+              </div>
+              <p>Все три пути дают первую полезную помощь до регистрации.</p>
+            </div>
+            <div class="entry-path-grid">
+              <article class="entry-path-card entry-route-card">
+                <span class="entry-path-number">01</span>
+                <div>
+                  <p class="section-label">НЕ ЗНАЮ, С ЧЕГО НАЧАТЬ</p>
+                  <h3>Получить персональный маршрут</h3>
+                  <p>Определим размещение, первое ведомство и следующие действия.</p>
+                </div>
+                <button class="primary-button" type="button" data-start-route>
+                  <span>Пройти тест</span><span aria-hidden="true">→</span>
+                </button>
+              </article>
+              <article class="entry-path-card">
+                <span class="entry-path-number">02</span>
+                <div>
+                  <p class="section-label">ПОЛУЧИЛ НЕМЕЦКИЙ ДОКУМЕНТ</p>
+                  <h3>Перевести и понять письмо</h3>
+                  <p>Полный текст, требования, срок, документы и ближайшее действие.</p>
+                </div>
+                <button class="secondary-button" type="button" data-route="document">
+                  <span>Разобрать документ</span><span aria-hidden="true">→</span>
+                </button>
+              </article>
+              <article class="entry-path-card">
+                <span class="entry-path-number">03</span>
+                <div>
+                  <p class="section-label">ЕСТЬ КОНКРЕТНЫЙ ВОПРОС</p>
+                  <h3>Спросить ИИ-помощника</h3>
+                  <p>Получить ориентир, план действий и официальные источники.</p>
+                </div>
+                <button class="secondary-button" type="button" data-open-question>
+                  <span>Задать вопрос бесплатно</span><span aria-hidden="true">↓</span>
+                </button>
+              </article>
+            </div>
+          </section>
+
+          <section class="guest-question-tool" id="guestQuestionTool" hidden>
+            <div class="guest-question-copy">
+              <p class="section-label">ПЕРВЫЙ ОТВЕТ · БЕЗ РЕГИСТРАЦИИ</p>
+              <h2>Что происходит и что мне делать?</h2>
+              <p>
+                Опишите ситуацию своими словами. Помощник даст прямой ответ, предложит
+                последовательность действий и покажет, какие сведения ещё нужны.
+              </p>
+              <div class="question-examples">
+                <button type="button" data-question-example="Я приехала с ребёнком, не могу оплачивать жильё и пока не зарегистрирована. Куда мне обратиться сначала?">Нет жилья и денег</button>
+                <button type="button" data-question-example="Мне пришло письмо из Jobcenter со сроком ответа, но я не понимаю, какие документы нужно отправить. Что делать?">Письмо Jobcenter</button>
+                <button type="button" data-question-example="Я нахожусь в Германии по §24 и хочу поступить в университет. Как правильно совместить учёбу и текущий статус?">§24 и университет</button>
+              </div>
+            </div>
+            <form class="guest-question-form" id="guestQuestionForm">
+              <label for="guestQuestion">Ваш вопрос</label>
+              <textarea id="guestQuestion" name="question" rows="7" maxlength="4000" placeholder="Например: я приехала с ребёнком, пока живу у знакомых и не могу оплачивать жильё дальше. Куда обращаться?" required></textarea>
+              <div class="question-form-meta">
+                <span>Не указывайте номера документов и банковские данные</span>
+                <span id="questionCounter">0 / 4000</span>
+              </div>
+              <p id="guestQuestionStatus" class="lead-form-status" role="status"></p>
+              <button class="primary-button" type="submit" id="askGuestQuestion">
+                <span>Получить первый ответ</span><span aria-hidden="true">→</span>
+              </button>
+            </form>
+          </section>
+
+          <section class="guest-answer" id="guestAnswer" hidden aria-live="polite">
+            <div class="guest-answer-head">
+              <div>
+                <p class="section-label">ПЕРВЫЙ ОТВЕТ ГОТОВ</p>
+                <h2>Ориентир для следующего шага</h2>
+              </div>
+              <span class="source-freshness is-fresh">С официальными источниками</span>
+            </div>
+            <div class="guest-answer-summary" id="guestAnswerSummary"></div>
+            <div class="guest-answer-grid">
+              <section>
+                <p class="section-label">ЧТО СДЕЛАТЬ</p>
+                <ol id="guestAnswerSteps"></ol>
+              </section>
+              <section>
+                <p class="section-label">ЧТО ПОДГОТОВИТЬ</p>
+                <ul id="guestAnswerDocuments"></ul>
+              </section>
+            </div>
+            <details class="guest-answer-details">
+              <summary>Что нужно уточнить и на чём основан ответ →</summary>
+              <div>
+                <section>
+                  <h3>Уточняющие вопросы</h3>
+                  <ul id="guestClarifyingQuestions"></ul>
+                </section>
+                <section>
+                  <h3>Источники</h3>
+                  <div id="guestAnswerSources"></div>
+                </section>
+              </div>
+            </details>
+            <p class="guest-answer-caution" id="guestAnswerCaution"></p>
+            <div class="guest-answer-conversion">
+              <div>
+                <strong>Ответ помог?</strong>
+                <span>Сохраните его и получите ещё 4 бесплатных вопроса в кабинете.</span>
+              </div>
+              <button class="primary-button" type="button" data-question-register>
+                <span>Сохранить ответ бесплатно</span><span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="guest-lead-capture" id="guestLeadCapture" hidden>
+            <div>
+              <p class="section-label">ЕЩЁ 4 БЕСПЛАТНЫХ ВОПРОСА</p>
+              <h2>Сохраните ответ в личном кабинете</h2>
+              <p>Мы сохраним контекст вопроса, чтобы вам не пришлось начинать объяснение заново.</p>
+            </div>
+            <form id="guestLeadForm">
+              <label>
+                <span>Как к вам обращаться <small>необязательно</small></span>
+                <input type="text" name="display_name" autocomplete="name" placeholder="Имя" />
+              </label>
+              <label>
+                <span>Email для входа</span>
+                <input type="email" name="email" autocomplete="email" placeholder="name@example.com" required />
+              </label>
+              <label class="consent-check">
+                <input type="checkbox" name="account_consent" required />
+                <span>Согласен(на) на создание кабинета и сохранение вопроса. Передача данных специалисту требует отдельного согласия.</span>
+              </label>
+              <p class="lead-form-status" id="guestLeadStatus" role="status"></p>
+              <button class="primary-button" type="submit">
+                <span>Создать бесплатный кабинет</span><span aria-hidden="true">→</span>
+              </button>
+            </form>
+          </section>
+
+          <section class="landing-capabilities" aria-labelledby="capabilitiesTitle">
+            <div class="landing-section-head">
+              <div>
+                <p class="section-label">ОДИН СЕРВИС ВМЕСТО ДЕСЯТКОВ ВКЛАДОК</p>
+                <h2 id="capabilitiesTitle">Помогаем пройти путь, а не просто прочитать инструкцию</h2>
+              </div>
+              <p>От первого решения о переезде до писем, сроков и общения с ведомствами.</p>
+            </div>
+            <div class="capability-grid">
+              <article>
+                <span>01</span>
+                <h3>Персональный маршрут</h3>
+                <p>Размещение, регистрация, основное ведомство и следующие действия.</p>
+              </article>
+              <article>
+                <span>02</span>
+                <h3>Документы без загадок</h3>
+                <p>Полный перевод, требования, сроки, риски и список того, что подготовить.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <h3>Ответ «Что делать?»</h3>
+                <p>Понятный план действий с источниками вместо общего совета.</p>
+              </article>
+              <article>
+                <span>04</span>
+                <h3>Контроль сроков</h3>
+                <p>Дела, напоминания и готовые черновики ответов на немецком.</p>
+              </article>
+              <article>
+                <span>05</span>
+                <h3>Работа, учёба и семья</h3>
+                <p>Параллельные пути интеграции без потери основного маршрута.</p>
+              </article>
+              <article>
+                <span>06</span>
+                <h3>Помощь человека</h3>
+                <p>Переводчик, юрист или персональный советник, когда ИИ уже недостаточно.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="landing-support">
+            <div class="support-copy">
+              <p class="section-label">ОНЛАЙН-ПОДДЕРЖКА ПОСЛЕ ПРИЕЗДА</p>
+              <h2>Вы не останетесь один на один с немецкой бюрократией</h2>
+              <p>
+                Кабинет сохраняет маршрут, документы и сроки. Если ситуация становится сложной,
+                можно подключить живого специалиста и передать ему уже собранный контекст.
+              </p>
+              <ul>
+                <li>Переводчики и сопровождение на Termin</li>
+                <li>Юристы и налоговые консультанты</li>
+                <li>Волонтёры и благотворительные организации</li>
+                <li>Региональные контакты Caritas, DRK и других служб</li>
+              </ul>
+              <small>Контакты организаций показываются как справочная база. Партнёрство отмечается только после официального подтверждения.</small>
+            </div>
+            <div class="support-assurance">
+              <p class="section-label">ПОЧЕМУ МОЖНО ДОВЕРЯТЬ</p>
+              <blockquote>«Сначала главное. Детали — только тогда, когда они помогают действовать».</blockquote>
+              <div>
+                <strong>Источники видны</strong>
+                <span>Показываем ведомство, ссылку и дату проверки.</span>
+              </div>
+              <div>
+                <strong>Границы ИИ понятны</strong>
+                <span>Система отмечает, когда нужен человек или официальное решение.</span>
+              </div>
+              <div>
+                <strong>Вы управляете данными</strong>
+                <span>Ничего не передаём специалисту без отдельного согласия.</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="landing-process">
+            <div class="landing-section-head">
+              <div>
+                <p class="section-label">КАК ЭТО РАБОТАЕТ</p>
+                <h2>От неопределённости к первому действию</h2>
+              </div>
+            </div>
+            <div class="process-steps">
+              <article><span>01</span><strong>Расскажите о ситуации</strong><p>Без имени, телефона и загрузки документов.</p></article>
+              <article><span>02</span><strong>Получите свой маршрут</strong><p>Конкретные первые шаги и полезные подсказки.</p></article>
+              <article><span>03</span><strong>Сохраните продолжение</strong><p>Бесплатный кабинет, 3 разбора документов и 5 вопросов ИИ.</p></article>
+            </div>
+            <button class="primary-button process-cta" type="button" data-start-route>
+              <span>Начать бесплатный тест</span>
+              <span aria-hidden="true">↓</span>
+            </button>
+          </section>
+
+          <section class="route-builder" id="routeBuilder">
+            <div class="route-builder-intro">
+              <div>
+                <p class="section-label">НАЧИНАЕМ · БЕЗ РЕГИСТРАЦИИ</p>
+                <h2>Несколько вопросов о вашей ситуации</h2>
+                <p>Можно вернуться к любому шагу. Ваш персональный ответ появится только в конце.</p>
+              </div>
+              <div class="route-progress" aria-label="Прогресс">
+                <span id="routeProgressText">Шаг 1 из 4</span>
+                <div class="progress-track"><span id="routeProgressBar" style="width: 25%"></span></div>
+              </div>
+            </div>
+
+            <form id="onboardingForm">
+              <fieldset class="route-step is-current" data-onboarding-step="1">
+                <legend>
+                  <span>01</span>
+                  <strong>Где вы сейчас?</strong>
+                  <small>Это определяет самый первый практический шаг.</small>
+                </legend>
+                <div class="choice-grid three-columns">
+                  <label class="route-choice">
+                    <input type="radio" name="stage" value="planning" checked />
+                    <span class="choice-mark">До</span>
+                    <strong>Ещё не приехал</strong>
+                    <small>Планирую поездку и хочу подготовиться.</small>
+                  </label>
+                  <label class="route-choice">
+                    <input type="radio" name="stage" value="arrived" />
+                    <span class="choice-mark">DE</span>
+                    <strong>Уже в Германии</strong>
+                    <small>Только приехал, регистрация ещё не закончена.</small>
+                  </label>
+                  <label class="route-choice">
+                    <input type="radio" name="stage" value="registered" />
+                    <span class="choice-mark">✓</span>
+                    <strong>Уже зарегистрирован</strong>
+                    <small>Есть Anmeldung, §24 или Fiktionsbescheinigung.</small>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="route-step" data-onboarding-step="2" hidden>
+                <legend>
+                  <span>02</span>
+                  <strong>Жильё и средства</strong>
+                  <small>Сначала определяем безопасность и размещение.</small>
+                </legend>
+                <div class="question-block">
+                  <p>Есть ли у вас место, где можно остановиться?</p>
+                  <div class="choice-grid three-columns compact-choices">
+                    <label class="route-choice">
+                      <input type="radio" name="housing" value="none" />
+                      <strong>Нет жилья</strong>
+                      <small>Нужно государственное размещение.</small>
+                    </label>
+                    <label class="route-choice">
+                      <input type="radio" name="housing" value="temporary" checked />
+                      <strong>Временно есть</strong>
+                      <small>Можно остановиться у знакомых или на короткий срок.</small>
+                    </label>
+                    <label class="route-choice">
+                      <input type="radio" name="housing" value="stable" />
+                      <strong>Жильё найдено</strong>
+                      <small>Есть адрес для проживания.</small>
+                    </label>
+                  </div>
+                </div>
+                <div class="question-block">
+                  <p>Можете оплачивать жизнь самостоятельно?</p>
+                  <div class="choice-grid three-columns compact-choices">
+                    <label class="route-choice">
+                      <input type="radio" name="funding" value="none" />
+                      <strong>Нет</strong>
+                      <small>Нужны жильё и финансовая помощь.</small>
+                    </label>
+                    <label class="route-choice">
+                      <input type="radio" name="funding" value="temporary" checked />
+                      <strong>Только первое время</strong>
+                      <small>Средств недостаточно для стабильной жизни.</small>
+                    </label>
+                    <label class="route-choice">
+                      <input type="radio" name="funding" value="full" />
+                      <strong>Да</strong>
+                      <small>Государственное содержание сейчас не требуется.</small>
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="route-step" data-onboarding-step="3" hidden>
+                <legend>
+                  <span>03</span>
+                  <strong>Работа, возраст и семья</strong>
+                  <small>Это предварительная маршрутизация, не решение ведомства.</small>
+                </legend>
+                <div class="question-block">
+                  <p>Как вы оцениваете возможность работать?</p>
+                  <div class="choice-grid four-columns compact-choices">
+                    <label class="route-choice">
+                      <input type="radio" name="work_capacity" value="able" checked />
+                      <strong>Могу работать</strong>
+                      <small>Минимум несколько часов в день.</small>
+                    </label>
+                    <label class="route-choice">
+                      <input type="radio" name="work_capacity" value="limited" />
+                      <strong>Есть ограничения</strong>
+                      <small>Здоровье существенно ограничивает работу.</small>
+                    </label>
+                    <label class="route-choice">
+                      <input type="radio" name="work_capacity" value="retirement" />
+                      <strong>Пенсионный возраст</strong>
+                      <small>Работа не является основным маршрутом.</small>
+                    </label>
+                    <label class="route-choice">
+                      <input type="radio" name="work_capacity" value="unknown" />
+                      <strong>Не знаю</strong>
+                      <small>Нужно уточнить ситуацию.</small>
+                    </label>
+                  </div>
+                </div>
+                <div class="route-inline-fields">
+                  <label>
+                    <span>Кто едет с вами?</span>
+                    <select name="family" id="onboardingFamily">
+                      <option value="alone">Еду один / одна</option>
+                      <option value="partner">Супруг или партнёр</option>
+                      <option value="children">Несовершеннолетние дети</option>
+                      <option value="parents">Родители</option>
+                      <option value="mixed">Несколько членов семьи</option>
+                    </select>
+                  </label>
+                  <label class="route-switch">
+                    <input type="checkbox" name="has_ukrainian_fop" />
+                    <span>
+                      <strong>Есть или был украинский ФОП</strong>
+                      <small>Добавим налоговый и предпринимательский контекст.</small>
+                    </span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="route-step" data-onboarding-step="4" hidden>
+                <legend>
+                  <span>04</span>
+                  <strong>Как вы хотите интегрироваться?</strong>
+                  <small>Можно выбрать несколько целей — они не исключают друг друга.</small>
+                </legend>
+                <div class="choice-grid goal-grid">
+                  <label class="route-choice">
+                    <input type="checkbox" name="goals" value="safety" checked />
+                    <strong>Временная защита</strong>
+                    <small>Регистрация, §24 и первые документы.</small>
+                  </label>
+                  <label class="route-choice">
+                    <input type="checkbox" name="goals" value="work" />
+                    <strong>Работа</strong>
+                    <small>Трудоустройство и признание квалификации.</small>
+                  </label>
+                  <label class="route-choice">
+                    <input type="checkbox" name="goals" value="study" />
+                    <strong>Университет</strong>
+                    <small>Учёба по §24 или отдельный студенческий путь.</small>
+                  </label>
+                  <label class="route-choice">
+                    <input type="checkbox" name="goals" value="ausbildung" />
+                    <strong>Ausbildung</strong>
+                    <small>Профессиональное обучение в Германии.</small>
+                  </label>
+                  <label class="route-choice">
+                    <input type="checkbox" name="goals" value="family" />
+                    <strong>Семья</strong>
+                    <small>Совместный приезд или воссоединение.</small>
+                  </label>
+                  <label class="route-choice">
+                    <input type="checkbox" name="goals" value="business" />
+                    <strong>Бизнес или ФОП</strong>
+                    <small>Доходы, налоги и самостоятельная деятельность.</small>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="route-form-actions">
+                <button class="secondary-button" id="onboardingBack" type="button" disabled>Назад</button>
+                <span id="onboardingValidation" role="status"></span>
+                <button class="primary-button" id="onboardingNext" type="button">
+                  <span>Продолжить</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="route-result" id="routeResult" hidden aria-live="polite">
+            <div class="route-result-head">
+              <div>
+                <p class="section-label">ВАШ МАРШРУТ ГОТОВ</p>
+                <h2>Вот с чего вам лучше начать</h2>
+              </div>
+              <span class="source-freshness" id="routeFreshness">Проверяем источники…</span>
+            </div>
+            <div class="result-delight">
+              <span aria-hidden="true">✓</span>
+              <p><strong>Мы сопоставили ваши ответы.</strong> Ниже — первый маршрут, ближайшие действия и возможности, которые можно развивать параллельно.</p>
+            </div>
+            <div class="route-result-grid">
+              <article class="route-result-card primary-route-card">
+                <span>01 · ПРИБЫТИЕ</span>
+                <h3 id="arrivalRouteTitle"></h3>
+                <strong id="arrivalRouteLabel"></strong>
+                <p id="arrivalRouteDescription"></p>
+              </article>
+              <article class="route-result-card">
+                <span>02 · ОСНОВНОЕ ВЕДОМСТВО</span>
+                <h3 id="authorityRouteTitle"></h3>
+                <strong id="authorityRouteLabel"></strong>
+                <p id="authorityRouteDescription"></p>
+              </article>
+            </div>
+            <div class="route-detail-grid">
+              <section class="portal-panel">
+                <div class="portal-panel-head">
+                  <div>
+                    <p class="section-label">ПОШАГОВО</p>
+                    <h2>Ближайшие действия</h2>
+                  </div>
+                </div>
+                <ol class="generated-route-steps" id="generatedRouteSteps"></ol>
+              </section>
+              <aside class="portal-panel route-integrations">
+                <div class="portal-panel-head">
+                  <div>
+                    <p class="section-label">ПАРАЛЛЕЛЬНЫЕ ЦЕЛИ</p>
+                    <h2>Формы интеграции</h2>
+                  </div>
+                </div>
+                <div id="generatedIntegrationTracks"></div>
+              </aside>
+            </div>
+            <section class="regional-support" id="regionalSupport">
+              <div class="landing-section-head">
+                <div>
+                  <p class="section-label" id="regionalSupportLabel">РЕГИОНАЛЬНАЯ ПРОВЕРКА</p>
+                  <h2 id="regionalSupportTitle">Куда обращаться в выбранной земле</h2>
+                </div>
+                <span class="regional-verification" id="regionalVerification">Официальные источники</span>
+              </div>
+              <p class="regional-support-intro" id="regionalSupportIntro">
+                Приём, распределение и компетентное ведомство зависят от земли и города. Выберите пилотный регион — покажем подтверждённую точку входа и полезные службы.
+              </p>
+              <div class="regional-picker" id="regionalPicker" role="tablist" aria-label="Пилотные регионы"></div>
+              <article class="regional-status-card" id="regionalStatusCard" aria-live="polite">
+                <div>
+                  <span id="regionalStatusBadge">Проверяем</span>
+                  <h3 id="regionalStatusName">Nordrhein-Westfalen</h3>
+                  <p id="regionalStatusText"></p>
+                </div>
+                <div class="regional-meta">
+                  <small id="regionalFocusLabel">Пилотный город</small>
+                  <strong id="regionalFocusCity">Bochum</strong>
+                  <time id="regionalCheckedAt"></time>
+                </div>
+              </article>
+              <div class="regional-service-grid" id="regionalServiceGrid"></div>
+              <details class="regional-directories">
+                <summary id="regionalDirectoriesSummary">Найти Jobcenter, Caritas, Tafel и переводчика рядом →</summary>
+                <div id="regionalDirectoryGrid"></div>
+              </details>
+              <p class="regional-legal-note" id="regionalLegalNote"></p>
+            </section>
+            <section class="route-advice">
+              <div class="landing-section-head">
+                <div>
+                  <p class="section-label">ПОЛЕЗНО УЖЕ СЕЙЧАС</p>
+                  <h2>Три правила спокойного старта</h2>
+                </div>
+              </div>
+              <div class="advice-grid">
+                <article><span>01</span><strong>Не отдавайте оригиналы</strong><p>Для большинства первых обращений подготовьте копии, а оригиналы держите при себе.</p></article>
+                <article><span>02</span><strong>Фиксируйте каждую отправку</strong><p>Сохраняйте письмо, список приложений и подтверждение отправки или загрузки.</p></article>
+                <article><span>03</span><strong>Сначала проверяйте срок</strong><p>Дата ответа в письме важнее объёма текста. В кабинете её можно поставить на контроль.</p></article>
+              </div>
+            </section>
+            <details class="route-sources">
+              <summary>
+                <p class="section-label">АКТУАЛЬНОСТЬ</p>
+                <h2>Официальные источники и дата проверки</h2>
+                <span>Раскрыть →</span>
+              </summary>
+              <div class="route-sources-body">
+                <div>
+                <p id="routeNotice"></p>
+                <button class="text-button route-refresh-button" type="button" id="refreshRouteSources">
+                  Проверить официальные страницы сейчас →
+                </button>
+                </div>
+                <div class="route-source-list" id="routeSourceList"></div>
+              </div>
+            </details>
+
+            <section class="expert-next-step">
+              <div class="landing-section-head">
+                <div>
+                  <p class="section-label">КОГДА НУЖЕН ЧЕЛОВЕК</p>
+                  <h2>Не обязательно разбираться со сложным вопросом в одиночку</h2>
+                </div>
+                <p>Сначала уточним задачу и стоимость. Контакт не передаётся специалисту без вашего отдельного согласия.</p>
+              </div>
+              <div class="expert-grid">
+                <article>
+                  <span class="expert-type">ПЛАТНАЯ КОНСУЛЬТАЦИЯ</span>
+                  <h3>Проверить вопрос с юристом</h3>
+                  <p>Для отказа ведомства, Widerspruch, пропущенного срока или другой ситуации с правовыми последствиями.</p>
+                  <button class="secondary-button" type="button" data-support-choice="lawyer">Узнать условия →</button>
+                </article>
+                <article>
+                  <span class="expert-type">ПЕРСОНАЛЬНЫЙ СОВЕТНИК</span>
+                  <h3>Разобрать путь с советником Лубенцом</h3>
+                  <p>Общая стратегия, последовательность действий и подготовка к сложному общению с ведомствами.</p>
+                  <button class="secondary-button" type="button" data-support-choice="lubenets">Запросить консультацию →</button>
+                </article>
+              </div>
+              <small class="referral-disclosure">Если консультация состоится, сервис может получить партнёрское вознаграждение. Это не влияет на предложенный маршрут и не увеличивает цену без отдельного уведомления.</small>
+            </section>
+
+            <section class="lead-capture" id="leadCapture">
+              <div class="lead-offer">
+                <p class="section-label">ВАШ БЕСПЛАТНЫЙ СТАРТОВЫЙ ПАКЕТ</p>
+                <h2 id="leadCaptureTitle">Сохраните маршрут и продолжайте в личном кабинете</h2>
+                <p>После регистрации маршрут не потеряется, а бесплатные возможности будут доступны сразу.</p>
+                <div class="lead-benefits">
+                  <div><strong>3</strong><span>полных перевода документов с анализом требований и сроков</span></div>
+                  <div><strong>5</strong><span>персональных ответов ИИ на вопрос «Что делать дальше?»</span></div>
+                </div>
+                <ul>
+                  <li>Персональный чек-лист и календарь действий</li>
+                  <li>Один простой черновик ответа на немецком</li>
+                  <li>Региональные официальные и благотворительные контакты</li>
+                </ul>
+              </div>
+              <form class="lead-form" id="leadForm">
+                <input type="hidden" name="requested_support" id="requestedSupport" value="" />
+                <label>
+                  <span>Как к вам обращаться <small>необязательно</small></span>
+                  <input type="text" name="display_name" autocomplete="name" placeholder="Имя" />
+                </label>
+                <label>
+                  <span>Email для входа в кабинет</span>
+                  <input type="email" name="email" autocomplete="email" placeholder="name@example.com" required />
+                </label>
+                <label class="consent-check">
+                  <input type="checkbox" name="account_consent" required />
+                  <span>Согласен(на) на создание кабинета и обработку данных для сохранения маршрута. Данные не передаются специалистам без отдельного согласия.</span>
+                </label>
+                <label class="consent-check optional-consent">
+                  <input type="checkbox" name="updates_consent" />
+                  <span>Можно присылать полезные обновления сервиса. Это необязательно.</span>
+                </label>
+                <p class="lead-form-status" id="leadFormStatus" role="status"></p>
+                <button class="primary-button" type="submit" id="registerLeadButton">
+                  <span>Создать бесплатный кабинет</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+                <small>Платёжные данные не нужны. Рассылка не включается автоматически.</small>
+              </form>
+            </section>
+            <div class="route-result-actions">
+              <button class="secondary-button" type="button" id="editRouteButton">Изменить ответы</button>
+              <button class="primary-button" type="button" data-open-lead>
+                <span>Сохранить маршрут бесплатно</span>
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </section>
+        </section>
+
+        <section class="app-view" data-view="home" hidden>
+          <header class="portal-heading">
+            <div>
+              <p class="section-label">ЛИЧНЫЙ КАБИНЕТ</p>
+              <h1>Добрый день.</h1>
+              <p>Здесь собраны ваши дела, документы и подтверждённые сроки.</p>
+            </div>
+            <button class="primary-button" type="button" data-route="document">
+              <span>Добавить письмо</span>
+              <span aria-hidden="true">＋</span>
+            </button>
+          </header>
+
+          <section class="welcome-credits" id="welcomeCredits" hidden>
+            <div>
+              <p class="section-label">БЕСПЛАТНЫЙ СТАРТОВЫЙ ПАКЕТ АКТИВЕН</p>
+              <h2>Маршрут сохранён. Можно переходить к реальным задачам.</h2>
+            </div>
+            <div class="credit-meter">
+              <strong>3</strong>
+              <span>разбора документов</span>
+            </div>
+            <div class="credit-meter">
+              <strong>5</strong>
+              <span>вопросов «Что делать?»</span>
+            </div>
+          </section>
+
+          <section class="attention-card">
+            <div class="attention-date">
+              <span>14</span>
+              <small>АВГ</small>
+            </div>
+            <div class="attention-copy">
+              <p class="section-label">БЛИЖАЙШЕЕ ДЕЙСТВИЕ</p>
+              <h2 id="dashboardDeadlineAction">Отправить документы в Finanzamt</h2>
+              <p id="dashboardDeadlineContext">Декларация за 2025 год · срок подтверждён</p>
+            </div>
+            <div class="attention-progress">
+              <span>2 из 3 документов готовы</span>
+              <div class="progress-track"><span style="width: 66%"></span></div>
+            </div>
+            <button class="round-action" id="dashboardOpenDeadlineCase" type="button" aria-label="Открыть дело">↗</button>
+          </section>
+
+          <section class="portal-panel next-actions-panel" aria-labelledby="todayActionsTitle">
+            <div class="portal-panel-head"><div><p class="section-label">СЛЕДУЮЩИЙ ШАГ</p><h2 id="todayActionsTitle">Сегодня вам нужно сделать</h2></div></div>
+            <div id="dashboardActions"></div>
+          </section>
+          <section class="portal-panel next-actions-panel" aria-labelledby="waitingTitle">
+            <div class="portal-panel-head"><div><p class="section-label">ОЖИДАНИЕ</p><h2 id="waitingTitle">Ждём ответа</h2></div></div>
+            <div id="dashboardWaiting"></div>
+          </section>
+
+          <section class="portal-stats" aria-label="Краткая сводка">
+            <article>
+              <span class="metric-value" id="metricActiveCases">3</span>
+              <span>активных дела</span>
+            </article>
+            <article>
+              <span class="metric-value" id="metricDeadlines">1</span>
+              <span>подтверждённых сроков</span>
+            </article>
+            <article>
+              <span class="metric-value" id="metricWaitingCases">2</span>
+              <span>ответа ожидаются</span>
+            </article>
+            <article>
+              <span class="metric-value" id="metricProfile">40%</span>
+              <span>профиль заполнен</span>
+            </article>
+          </section>
+
+          <section class="portal-grid">
+            <div class="portal-panel active-cases-panel">
+              <div class="portal-panel-head">
+                <div>
+                  <p class="section-label">АКТИВНЫЕ ДЕЛА</p>
+                  <h2>Что происходит сейчас</h2>
+                </div>
+                <button class="text-button" type="button" data-route="cases">Все дела →</button>
+              </div>
+
+              <div id="dashboardCases"></div>
+            </div>
+
+            <aside class="portal-panel profile-card">
+              <div class="profile-orbit">
+                <span id="profileOrbitValue">40%</span>
+              </div>
+              <p class="section-label">БЮРОКРАТИЧЕСКИЙ ПРОФИЛЬ</p>
+              <h2>Добавьте контекст один раз</h2>
+              <p>Тогда сервису не придётся повторно спрашивать город, статус и ведомства.</p>
+              <button class="secondary-button" type="button" data-route="profile">Продолжить заполнение</button>
+            </aside>
+          </section>
+        </section>
+
+        <section class="app-view" data-view="cases" hidden>
+          <header class="portal-heading compact-heading">
+            <div>
+              <p class="section-label">МОИ ДЕЛА</p>
+              <h1>Вся история вопросов</h1>
+              <p>Письма, действия и ответы сгруппированы по делу.</p>
+            </div>
+            <button class="primary-button" type="button" data-route="document">
+              <span>Создать дело</span>
+              <span aria-hidden="true">＋</span>
+            </button>
+          </header>
+
+          <div class="filter-row" aria-label="Фильтры дел">
+            <button class="filter-chip is-active" data-case-filter="all" type="button">Все <span>0</span></button>
+            <button class="filter-chip" data-case-filter="active" type="button">В работе <span>0</span></button>
+            <button class="filter-chip" data-case-filter="waiting" type="button">Ожидают ответа <span>0</span></button>
+            <button class="filter-chip" data-case-filter="specialist" type="button">Нужен специалист <span>0</span></button>
+            <button class="filter-chip" data-case-filter="closed" type="button">Закрытые <span>0</span></button>
+          </div>
+          <label class="portal-search-label" for="casesSearch">Найти дело или документ
+            <input id="casesSearch" type="search" placeholder="Ведомство, название, письмо или файл" />
+          </label>
+          <p id="casesResultCount" class="portal-result-count" role="status"></p>
+
+          <div class="cases-table portal-panel">
+            <div class="cases-table-head">
+              <span>Дело</span>
+              <span>Статус</span>
+              <span>Следующее действие</span>
+              <span>Срок</span>
+            </div>
+            <div id="casesTableBody"></div>
+          </div>
+        </section>
+
+        <section class="app-view" data-view="case" hidden>
+          <button class="back-button" type="button" data-route="cases">← Все дела</button>
+          <header class="case-heading">
+            <div class="authority-icon large" id="caseHeadingIcon">F</div>
+            <div class="case-heading-copy">
+              <div class="case-heading-meta">
+                <span id="caseAuthorityName">FINANZAMT BERLIN</span>
+                <em class="status-badge action" id="caseStatusBadge">Требует действия</em>
+              </div>
+              <h1 id="caseTitle">Декларация за 2025 год</h1>
+              <p id="caseMeta">Aktenzeichen 12/345/67890 · создано 14 июля 2026</p>
+            </div>
+            <button class="primary-button" type="button" data-route="document">
+              <span>Добавить письмо</span>
+              <span aria-hidden="true">＋</span>
+            </button>
+          </header>
+
+          <section class="case-overview-grid">
+            <article class="case-action-card">
+              <p class="section-label">СЛЕДУЮЩЕЕ ДЕЙСТВИЕ</p>
+              <h2 id="caseNextAction">Подготовить и отправить недостающие документы</h2>
+              <p id="caseChecklistSummary">Два из трёх документов уже отмечены как готовые.</p>
+              <div class="progress-track"><span style="width: 66%"></span></div>
+            </article>
+            <article class="case-deadline-card">
+              <p class="section-label">ПОДТВЕРЖДЁННЫЙ СРОК</p>
+              <strong id="caseDeadlineValue">14 августа 2026</strong>
+              <span id="caseDeadlineHint">срок подтверждён пользователем</span>
+              <button class="text-button" type="button" data-route="deadlines">Открыть в сроках →</button>
+            </article>
+            <article class="case-risk-card">
+              <p class="section-label">СЛОЖНОСТЬ</p>
+              <strong id="caseRiskValue"><span class="risk-dot yellow"></span> Нужна проверка</strong>
+              <span id="caseRiskHint">Черновик можно подготовить самостоятельно.</span>
+            </article>
+          </section>
+
+          <section class="case-content-grid">
+            <div class="portal-panel timeline-panel">
+              <div class="portal-panel-head">
+                <div>
+                  <p class="section-label">TIMELINE</p>
+                  <h2>История дела</h2>
+                </div>
+                <button class="secondary-button" type="button" id="addNoteButton">Добавить заметку</button>
+              </div>
+
+              <ol class="timeline-list" id="timelineList"></ol>
+              <div class="case-reply-flow">
+                <h3>Подготовить ответ</h3>
+                <p>Отметьте только документы, которые действительно готовы. Черновик можно проверить и изменить перед отправкой.</p>
+                <div id="replyDocumentChoices"></div>
+                <label>Дополнение к ответу <textarea id="replyExplanation" rows="3" placeholder="Необязательно. Поясните, чего не хватает."></textarea></label>
+                <button class="primary-button" id="prepareCaseReply" type="button">Создать черновик</button>
+                <div id="caseDraft"></div>
+              </div>
+            </div>
+
+            <aside class="case-sidebar">
+              <section class="portal-panel case-documents">
+                <div class="portal-panel-head">
+                  <div>
+                    <p class="section-label">ДОКУМЕНТЫ</p>
+                    <h2>Файлы дела</h2>
+                  </div>
+                  <span class="soft-badge" id="caseDocumentsCount">0 файлов</span>
+                </div>
+                <label class="portal-search-label" for="caseDocumentsSearch">Найти файл в деле
+                  <input id="caseDocumentsSearch" type="search" placeholder="Название или требование" />
+                </label>
+                <div class="filter-row case-document-filters" aria-label="Фильтры документов">
+                  <button class="filter-chip is-active" data-document-filter="all" type="button">Все <span>0</span></button>
+                  <button class="filter-chip" data-document-filter="letters" type="button">Письма <span>0</span></button>
+                  <button class="filter-chip" data-document-filter="attachments" type="button">Приложения <span>0</span></button>
+                </div>
+                <div id="caseDocumentsList"></div>
+              </section>
+              <section class="portal-panel case-sources">
+                <p class="section-label">ОФИЦИАЛЬНЫЕ СЕРВИСЫ</p>
+                <h2>По этому делу</h2>
+                <p>Откройте источник ведомства и проверьте, какой способ подачи указан в вашем письме.</p>
+                <div id="caseOfficialLinks"></div>
+              </section>
+
+              <section class="portal-panel case-checklist">
+                <p class="section-label">ЧЕК-ЛИСТ</p>
+                <h2>Подготовка ответа</h2>
+                <div id="caseChecklistList"></div>
+                <button class="secondary-button full-button" type="button" data-route="document">Открыть разбор</button>
+              </section>
+            </aside>
+          </section>
+        </section>
+
+        <section class="app-view" data-view="deadlines" hidden>
+          <header class="portal-heading compact-heading">
+            <div>
+              <p class="section-label">FRISTENRADAR</p>
+              <h1>Сроки и напоминания</h1>
+              <p>Напоминания включаются только после подтверждения даты.</p>
+            </div>
+            <button class="secondary-button" type="button">Настроить уведомления</button>
+          </header>
+
+          <section class="deadline-summary">
+            <article><span id="deadlineOverdueCount">0</span><small>просрочено</small></article>
+            <article><span id="deadlineActiveCount">1</span><small>активных подтверждённых</small></article>
+            <article><span id="deadlineConfirmCount">1</span><small>нужно подтвердить</small></article>
+            <article><span id="deadlineCompletedCount">0</span><small>завершено</small></article>
+          </section>
+
+          <section class="deadlines-layout">
+            <div class="portal-panel deadlines-list" id="deadlinesList"></div>
+
+            <aside class="portal-panel deadline-rules">
+              <p class="section-label">КАК РАБОТАЮТ СРОКИ</p>
+              <h2>Сначала подтверждение</h2>
+              <ol>
+                <li><span>01</span> Система находит дату и показывает фрагмент оригинала.</li>
+                <li><span>02</span> Вы подтверждаете или исправляете дату.</li>
+                <li><span>03</span> После этого включаются напоминания.</li>
+              </ol>
+            </aside>
+          </section>
+        </section>
+
+        <section class="app-view" data-view="profile" hidden>
+          <header class="portal-heading compact-heading">
+            <div>
+              <p class="section-label">БЮРОКРАТИЧЕСКИЙ ПРОФИЛЬ</p>
+              <h1>Ваш контекст в Германии</h1>
+              <p>Заполняйте только те разделы, которые нужны вашим делам.</p>
+            </div>
+            <div class="profile-completion"><strong id="profileCompletionValue">40%</strong><span>заполнено</span></div>
+          </header>
+
+          <section class="profile-layout">
+            <aside class="profile-nav portal-panel">
+              <button class="is-active" type="button">Основное</button>
+              <button type="button">Пребывание</button>
+              <button type="button">Работа и доходы</button>
+              <button type="button">Семья и выплаты</button>
+              <button type="button">Налоги</button>
+              <button type="button">Украина и ФОП</button>
+              <button type="button">Конфиденциальность</button>
+            </aside>
+
+            <div class="portal-panel profile-form">
+              <div class="profile-section-head">
+                <div>
+                  <p class="section-label">ОСНОВНОЕ</p>
+                  <h2>Минимальный контекст</h2>
+                  <p>Эти данные помогают учитывать региональные ведомства и язык ответа.</p>
+                </div>
+                <span class="saved-indicator">Сохранено</span>
+              </div>
+              <div class="form-grid">
+                <label>
+                  <span>Язык общения</span>
+                  <select id="profileLanguage">
+                    <option value="ru">Русский</option>
+                    <option value="uk">Украинский</option>
+                    <option value="de">Немецкий</option>
+                    <option value="en">Английский</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Федеральная земля</span>
+                  <select id="profileFederalState">
+                    <option>Berlin</option>
+                    <option>Brandenburg</option>
+                    <option>Bayern</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Город</span>
+                  <input id="profileCity" type="text" value="Berlin" />
+                </label>
+                <label>
+                  <span>Дата въезда</span>
+                  <input id="profileArrivalDate" type="text" placeholder="Не указана" />
+                </label>
+              </div>
+              <div class="privacy-callout">
+                <span>◌</span>
+                <div>
+                  <strong>Вы контролируете данные</strong>
+                  <p>Каждый раздел можно очистить отдельно. Данные не используются для обучения моделей без отдельного согласия.</p>
+                </div>
+              </div>
+              <div class="profile-actions">
+                <button class="secondary-button" type="button">Очистить раздел</button>
+                <button class="primary-button" id="saveProfileButton" type="button">Сохранить изменения</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="app-view document-workspace" data-view="document" hidden>
+          <div class="document-context-bar">
+            <button class="back-button" id="documentBackButton" type="button" data-route="home">← Кабинет</button>
+            <span>После разбора выберите существующее дело или создайте новое.</span>
+          </div>
+
+        <section class="hero">
+          <p class="eyebrow" data-i18n="heroEyebrow">БЮРОКРАТИЯ БЕЗ ЛИШНЕГО ШУМА</p>
+          <h1 data-i18n="heroTitle">Спокойно. Разберём, что делать дальше.</h1>
+          <p class="hero-copy" data-i18n="heroCopy">
+            Добавьте письмо — мы соберём главное в один понятный следующий шаг.
+          </p>
+        </section>
+
+        <section class="input-grid">
+          <div class="panel upload-panel">
+            <div class="panel-head">
+              <div>
+                <p class="section-label" data-i18n="newCaseLabel">НОВОЕ ДЕЛО</p>
+                <h2 data-i18n="uploadTitle">Добавьте письмо из ведомства</h2>
+              </div>
+              <div class="status-pill" id="statusPill" data-i18n="localPrototype">Локальный прототип</div>
+            </div>
+
+            <label class="drop-zone">
+              <input id="fileInput" type="file" accept=".txt,text/plain,.pdf,application/pdf,image/*" />
+              <span class="drop-icon">＋</span>
+              <span class="drop-copy">
+                <strong data-i18n="uploadButton">Выбрать PDF, фото или текст</strong>
+                <small id="uploadHint" data-i18n="uploadHint">Или вставьте текст письма ниже</small>
+              </span>
+            </label>
+
+            <textarea id="documentInput" spellcheck="false"></textarea>
+            <p class="privacy-note">Используйте только вымышленные данные в публичном демо. В локальном кабинете письмо сохраняется после выбора дела.</p>
+
+            <div class="sample-row">
+              <span data-i18n="samplesTitle">Попробовать пример:</span>
+              <button class="sample-chip" data-sample="finanzamt">Finanzamt</button>
+              <button class="sample-chip" data-sample="jobcenter">Jobcenter</button>
+              <button class="sample-chip" data-sample="fop">UA-FOP</button>
+            </div>
+
+            <div class="toolbar">
+              <p class="privacy-note" data-i18n="privacyNote">Для проверки используйте вымышленные данные.</p>
+              <button class="primary-button" id="analyzeButton">
+                <span data-i18n="analyzeButton">Показать следующий шаг</span>
+                <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+          </div>
+
+          <aside class="panel flow-panel">
+            <p class="section-label" data-i18n="howTitle">КАК ЭТО РАБОТАЕТ</p>
+            <div class="flow-step active">
+              <span>01</span>
+              <div>
+                <strong data-i18n="flowOneTitle">Добавьте письмо</strong>
+                <p data-i18n="flowOneText">Файл или текст — как вам удобнее.</p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <span>02</span>
+              <div>
+                <strong data-i18n="flowTwoTitle">Проверьте главное</strong>
+                <p data-i18n="flowTwoText">Ведомство, срок и требуемые документы.</p>
+              </div>
+            </div>
+            <div class="flow-step">
+              <span>03</span>
+              <div>
+                <strong data-i18n="flowThreeTitle">Сделайте один шаг</strong>
+                <p data-i18n="flowThreeText">Получите короткий план и черновик ответа.</p>
+              </div>
+            </div>
+            <blockquote data-i18n="flowQuote">«Сначала главное. Детали — только когда они нужны».</blockquote>
+          </aside>
+        </section>
+
+        <section class="result-grid" id="resultGrid" hidden>
+          <section class="portal-panel document-case-flow" id="documentCaseFlow" hidden>
+            <p class="section-label">СОХРАНИТЬ ПРОДОЛЖЕНИЕ</p>
+            <h2>К какому делу относится письмо?</h2>
+            <p id="documentCaseSummary"></p>
+            <div id="documentCaseMatches"></div>
+            <button class="secondary-button" id="createDocumentCase" type="button">Создать новое дело</button>
+            <p id="documentCaseMessage" role="status"></p>
+          </section>
+          <div class="result-heading">
+            <div>
+              <p class="section-label" data-i18n="resultLabel">РЕЗУЛЬТАТ</p>
+              <h2 data-i18n="resultTitle">Ваш документ</h2>
+            </div>
+            <div class="risk-card" id="riskCard">
+              <span class="risk-light" id="riskLight"></span>
+              <span id="riskTitle">—</span>
+            </div>
+          </div>
+
+          <details class="result-section translation-section">
+            <summary class="section-summary">
+              <span class="section-index">01</span>
+              <span class="section-summary-copy">
+                <strong data-i18n="fullTranslationTitle">Перевод документа</strong>
+                <small data-i18n="translationHint">Полный текст на выбранном языке</small>
+              </span>
+              <span class="disclosure-state">
+                <span class="state-open" data-i18n="collapseLabel">Свернуть</span>
+                <span class="state-closed" data-i18n="expandLabel">Открыть полностью</span>
+                <span class="disclosure-icon">＋</span>
+              </span>
+            </summary>
+            <div class="section-body translation-body">
+              <pre id="fullTranslation"></pre>
+            </div>
+          </details>
+
+          <details class="result-section analysis-section" open>
+            <summary class="section-summary">
+              <span class="section-index">02</span>
+              <span class="section-summary-copy">
+                <strong data-i18n="analysisTitle">Разбор документа</strong>
+                <small data-i18n="analysisHint">Главное действие, срок и необходимые документы</small>
+              </span>
+              <span class="disclosure-state">
+                <span class="state-open" data-i18n="collapseLabel">Свернуть</span>
+                <span class="state-closed" data-i18n="expandDetailsLabel">Показать разбор</span>
+                <span class="disclosure-icon">＋</span>
+              </span>
+            </summary>
+            <div class="section-body">
+              <div class="summary-grid">
+                <article class="summary-card action-card">
+                  <span class="card-number">01</span>
+                  <p data-i18n="actionLabel">СЛЕДУЮЩЕЕ ДЕЙСТВИЕ</p>
+                  <h3 id="summaryAction">—</h3>
+                  <small id="riskSummary"></small>
+                </article>
+                <article class="summary-card">
+                  <span class="card-number">02</span>
+                  <p data-i18n="deadlineLabel">СРОК</p>
+                  <h3 id="summaryDeadline">—</h3>
+                  <small data-i18n="deadlineHint">Проверьте дату в оригинале перед отправкой.</small>
+                </article>
+                <article class="summary-card">
+                  <span class="card-number">03</span>
+                  <p data-i18n="authorityLabel">КТО НАПИСАЛ</p>
+                  <h3 id="summaryAuthority">—</h3>
+                  <small id="summaryReference">—</small>
+                </article>
+              </div>
+
+              <div class="checklist-panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="section-label" data-i18n="documentsLabel">ПОДГОТОВИТЬ</p>
+                    <h2 data-i18n="requestTitle">Что понадобится</h2>
+                  </div>
+                  <span class="soft-badge" data-i18n="checklistBadge">Чек-лист</span>
+                </div>
+                <div class="send-grid" id="sendChecklist"></div>
+              </div>
+            </div>
+          </details>
+
+          <details class="result-section compact-section">
+            <summary class="section-summary">
+              <span class="section-index">03</span>
+              <span class="section-summary-copy">
+                <strong data-i18n="fieldsTitle">Найденные данные</strong>
+                <small data-i18n="fieldsHint">Объяснение, даты, суммы и номера дела</small>
+              </span>
+              <span class="disclosure-state">
+                <span class="state-open" data-i18n="collapseLabel">Свернуть</span>
+                <span class="state-closed" data-i18n="expandDetailsLabel">Показать детали</span>
+                <span class="disclosure-icon">＋</span>
+              </span>
+            </summary>
+            <div class="section-body details-grid">
+              <div class="detail-card">
+                <h3 data-i18n="explanationTitleBlock">Понятное объяснение</h3>
+                <pre id="plainExplanation"></pre>
+              </div>
+              <div class="detail-card">
+                <h3 data-i18n="fieldsTitle">Найденные поля</h3>
+                <div class="field-grid" id="fieldGrid"></div>
+              </div>
+            </div>
+          </details>
+
+          <details class="result-section compact-section">
+            <summary class="section-summary">
+              <span class="section-index">04</span>
+              <span class="section-summary-copy">
+                <strong data-i18n="nativeReplyTitle">Ответ на вашем языке</strong>
+                <small data-i18n="nativeReplyHint">Версия ответа для проверки смысла</small>
+              </span>
+              <span class="disclosure-state">
+                <span class="state-open" data-i18n="collapseLabel">Свернуть</span>
+                <span class="state-closed" data-i18n="expandDetailsLabel">Показать детали</span>
+                <span class="disclosure-icon">＋</span>
+              </span>
+            </summary>
+            <div class="section-body">
+              <pre id="nativeReply"></pre>
+            </div>
+          </details>
+
+          <details class="result-section reply-section">
+            <summary class="section-summary">
+              <span class="section-index">05</span>
+              <span class="section-summary-copy">
+                <strong data-i18n="germanReplyTitle">Ответ на немецком</strong>
+                <small data-i18n="replyHint">Готовый черновик — проверьте перед отправкой</small>
+              </span>
+              <span class="disclosure-state">
+                <span class="state-open" data-i18n="collapseLabel">Свернуть</span>
+                <span class="state-closed" data-i18n="expandReplyLabel">Показать ответ</span>
+                <span class="disclosure-icon">＋</span>
+              </span>
+            </summary>
+            <div class="section-body">
+              <pre id="germanDraft"></pre>
+            </div>
+          </details>
+
+          <details class="result-section compact-section">
+            <summary class="section-summary">
+              <span class="section-index">06</span>
+              <span class="section-summary-copy">
+                <strong data-i18n="handoffTitle">Пакет для специалиста</strong>
+                <small data-i18n="handoffExplain">Сводка дела, сроков, документов и вопросов</small>
+              </span>
+              <span class="disclosure-state">
+                <span class="state-open" data-i18n="collapseLabel">Свернуть</span>
+                <span class="state-closed" data-i18n="expandDetailsLabel">Показать детали</span>
+                <span class="disclosure-icon">＋</span>
+              </span>
+            </summary>
+            <div class="section-body">
+              <div class="download-row">
+                <p class="hint" data-i18n="handoffExplain">Сводка дела, сроков, документов и вопросов.</p>
+                <button class="secondary-button" id="downloadButton" data-i18n="downloadButton">Скачать .md</button>
+              </div>
+              <pre id="handoffPackage"></pre>
+            </div>
+          </details>
+        </section>
+        </section>
+
+        <footer>
+          <span>UA—DE Navigator</span>
+          <span data-i18n="footerCopy">Понятный следующий шаг в немецкой бюрократии.</span>
+        </footer>
+      </section>
+    </main>
+
+    <nav class="mobile-nav" aria-label="Мобильная навигация">
+      <button type="button" data-route="welcome"><span>⌂</span>Маршрут</button>
+      <button type="button" data-route="home"><span>◇</span>Кабинет</button>
+      <button type="button" data-route="cases"><span>□</span>Дела</button>
+      <button type="button" data-route="deadlines"><span>◷</span>Сроки</button>
+      <button type="button" data-route="profile"><span>○</span>Профиль</button>
+    </nav>
+
+    <script src="./demo-api.js"></script>
+    <script src="./portal.js"></script>
+    <script src="./guest-tools.js"></script>
+    <script src="./onboarding.js"></script>
+    <script src="./regional-support.js"></script>
+    <script src="./app.js"></script>
+    <script src="./site-i18n.js"></script>
+  </body>
+</html>
