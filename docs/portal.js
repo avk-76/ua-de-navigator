@@ -112,6 +112,10 @@ async function apiRequest(path, options = {}) {
 
 function navigatePortal(route, options = {}) {
   const targetRoute = portalRoutes.has(route) ? route : "welcome";
+  if (window.uaDeAccount?.shouldGuard(targetRoute)) {
+    window.uaDeAccount.openLogin();
+    return;
+  }
   const previousRoute = document.body.dataset.portalView || "welcome";
   if (targetRoute === "document" && previousRoute !== "document") {
     portalState.documentOriginCaseId = previousRoute === "case" ? portalState.selectedCaseId : null;
@@ -164,6 +168,8 @@ function navigatePortal(route, options = {}) {
 }
 
 document.addEventListener("click", (event) => {
+  const accountMenu = document.querySelector(".account-menu");
+  if (accountMenu && !event.target.closest(".account-menu")) accountMenu.removeAttribute("open");
   const caseTarget = event.target.closest("[data-case-id]");
   if (caseTarget) {
     portalState.selectedCaseId = caseTarget.dataset.caseId;
@@ -174,6 +180,7 @@ document.addEventListener("click", (event) => {
 
   const routeTarget = event.target.closest("[data-route]");
   if (routeTarget) {
+    accountMenu?.removeAttribute("open");
     navigatePortal(routeTarget.dataset.route);
   }
 });

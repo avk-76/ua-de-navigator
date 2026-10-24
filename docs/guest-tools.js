@@ -76,10 +76,10 @@
         en: "Creating account…",
       },
       savingCredits: {
-        ru: "Сохраняем вопрос и бесплатные лимиты.",
-        uk: "Зберігаємо запитання та безкоштовні ліміти.",
-        de: "Frage und kostenlose Kontingente werden gespeichert.",
-        en: "Saving your question and free allowances.",
+        ru: "Отправляем письмо для подтверждения почты.",
+        uk: "Надсилаємо лист для підтвердження пошти.",
+        de: "E-Mail zur Bestätigung wird gesendet.",
+        en: "Sending your email confirmation link.",
       },
       answerFailed: {
         ru: "Не удалось получить ответ",
@@ -165,6 +165,7 @@
 
   document.querySelectorAll("[data-open-question]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (document.body.dataset.portalView !== "welcome") navigatePortal("welcome", { instant: true });
       tool.hidden = false;
       answerSection.hidden = true;
       guestLeadCapture.hidden = true;
@@ -201,17 +202,21 @@
     status.textContent = guestCopy("matchingSources");
 
     try {
-      const response = await fetch("/api/guest/question", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: sessionId,
-          question,
+      let payload;
+      if (window.uaDeCloud?.configured) {
+        await window.uaDeSourceRefresh;
+        payload = await window.uaDeCloud.invoke("question", {
+          question: window.uaDeLocalDocument?.redact(question) || question,
           language: document.querySelector("#languageSelect")?.value || "ru",
-        }),
-      });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || guestCopy("answerFailed"));
+        });
+      } else {
+        const response = await fetch("/api/guest/question", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: sessionId, question, language: guestLanguage() }),
+        });
+        payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || guestCopy("answerFailed"));
+      }
       status.textContent = "";
       renderAnswer(payload.answer);
     } catch (error) {
@@ -247,39 +252,17 @@
     leadStatus.textContent = guestCopy("savingCredits");
 
     try {
-      const response = await fetch("/api/leads/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.get("email"),
-          display_name: formData.get("display_name"),
-          preferred_language: document.querySelector("#languageSelect")?.value || "ru",
-          session_id: sessionId,
-          requested_support: "",
-          consent_flags: {
-            account: formData.get("account_consent") === "on",
-            product_updates: false,
-            partner_transfer: false,
-          },
-        }),
+      if (!window.uaDeCloud?.configured) throw new Error("Регистрация пока не подключена к Supabase.");
+      await window.uaDeCloud.requestEmail(String(formData.get("email")).trim().toLowerCase(), {
+        display_name: String(formData.get("display_name")).trim(),
+        preferred_language: guestLanguage(),
+        federal_state: String(formData.get("federal_state") || "").trim(),
+        lead_goal: String(formData.get("lead_goal")),
+        lead_source: "question",
+        account_consent: formData.get("account_consent") === "on",
+        updates_consent: false,
       });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || guestCopy("accountFailed"));
-      const documents = payload.welcome_pack?.translation_credits ?? 3;
-      const questions = payload.welcome_pack?.ai_question_credits ?? 4;
-      localStorage.setItem("ua-de-lead-email", String(formData.get("email") || ""));
-      const welcomeCredits = document.querySelector("#welcomeCredits");
-      if (welcomeCredits) welcomeCredits.hidden = false;
-      guestLeadForm.innerHTML = `
-        <div class="lead-success">
-          <span class="choice-mark">✓</span>
-          <strong>${guestCopy("answerSaved")}</strong>
-          <p>${guestCopy("saved", { questions, documents })}</p>
-          <button class="primary-button" type="button" data-route="home">
-            <span>${guestCopy("openAccount")}</span><span aria-hidden="true">→</span>
-          </button>
-        </div>
-      `;
+      leadStatus.textContent = "Письмо отправлено. Перейдите по ссылке из письма, чтобы подтвердить почту и открыть кабинет.";
     } catch (error) {
       leadStatus.textContent = error.message;
       submit.disabled = false;

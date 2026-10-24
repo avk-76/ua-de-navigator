@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "scripts": {
+    "build:ocr": "node tools/prepare-ocr-assets.mjs",
+    "build:cloud": "node tools/build-cloud.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0",
+    "@tesseract.js-data/deu": "1.0.0",
+    "pdfjs-dist": "5.4.624",
+    "tesseract.js": "7.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

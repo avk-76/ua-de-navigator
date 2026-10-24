@@ -5,10 +5,8 @@ Minimal local backend for MVP 0.2.
 ## What works now
 
 - Serves the prototype at `http://127.0.0.1:8787/prototype/`.
-- Accepts uploads at `POST /api/extract`.
-- Extracts text from `.txt`.
-- Extracts text layer from PDFs.
-- Returns a clear message for photos/scans because image OCR provider is not connected yet.
+- The browser reads TXT, PDF, and image files locally and asks the visitor to review redacted text before analysis.
+- `POST /api/extract` is disabled to avoid uploading raw personal documents.
 
 ## Start
 

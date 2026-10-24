@@ -1,0 +1,4 @@
+Tesseract.js 7.0.0 and tesseract.js-core 7.0.0: https://github.com/naptha/tesseract.js
+PDF.js 5.4.624: https://github.com/mozilla/pdf.js
+German OCR language data @tesseract.js-data/deu 1.0.0: https://github.com/naptha/tessdata
+All libraries run in the client browser; document bytes are not sent to these sources.

@@ -17,8 +17,8 @@
 }
 
 .onboarding-hero-copy {
-  min-height: 410px;
-  padding: 52px;
+  min-height: 0;
+  padding: 36px;
   background:
     radial-gradient(circle at 90% 20%, rgba(220, 229, 231, 0.16), transparent 15rem),
     linear-gradient(135deg, rgba(126, 151, 158, 0.36), rgba(13, 40, 49, 0.72));
@@ -26,12 +26,12 @@
 
 .onboarding-hero-copy h1 {
   max-width: 780px;
-  margin: 18px 0 24px;
+  margin: 18px 0 20px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(52px, 7vw, 86px);
+  font-size: clamp(30px, 4vw, 44px);
   font-weight: 400;
-  letter-spacing: -0.055em;
-  line-height: 0.92;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
 }
 
 .onboarding-hero-copy > p:not(.section-label) {
@@ -797,6 +797,53 @@
   }
 }
 
+.privacy-review-dialog {
+  width: min(760px, calc(100vw - 24px));
+  max-height: min(92vh, 900px);
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: 24px;
+  background: #20343b;
+  color: var(--ink);
+  padding: clamp(20px, 4vw, 36px);
+  box-shadow: var(--shadow);
+}
+.privacy-review-dialog::backdrop { background: rgba(4, 17, 22, 0.8); }
+.privacy-review-dialog form { display: grid; gap: 14px; }
+.privacy-review-dialog h2 { margin: 0; font: 400 clamp(27px, 4vw, 38px)/1.1 Georgia, "Times New Roman", serif; }
+.privacy-review-dialog p { margin: 0; color: var(--muted); line-height: 1.5; }
+.privacy-review-dialog textarea {
+  width: 100%;
+  min-height: 230px;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: #152b32;
+  color: var(--ink);
+  padding: 14px;
+  font: 14px/1.5 ui-monospace, Consolas, monospace;
+}
+
+.privacy-review-dialog input[type="email"],
+.privacy-review-dialog input[type="password"],
+.privacy-review-dialog input[type="text"],
+.guest-lead-capture select,
+.lead-form select {
+  width: 100%;
+  min-height: 45px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(7, 25, 31, 0.42);
+  color: var(--ink);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.lead-privacy-note { color: var(--quiet); font-size: 12px; line-height: 1.5; }
+.privacy-review-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+@media (max-width: 620px) {
+  .privacy-review-actions button { flex: 1 1 100%; }
+}
+
 @media (max-width: 700px) {
   .onboarding-hero {
     margin-top: 34px;
@@ -808,10 +855,6 @@
   .route-result {
     border-radius: 22px;
     padding: 22px;
-  }
-
-  .onboarding-hero-copy h1 {
-    font-size: 48px;
   }
 
   .onboarding-hero-copy > p:not(.section-label) {

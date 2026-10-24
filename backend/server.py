@@ -74,7 +74,7 @@ class NavigatorHandler(SimpleHTTPRequestHandler):
     def do_POST(self) -> None:
         path = urlparse(self.path).path
         if path == "/api/extract":
-            return self._handle_extract()
+            return self._json(410, {"ok": False, "error": "Documents are read and redacted on the client's device."})
         if path == "/api/documents/analyze":
             payload = self._read_json_body()
             if payload is None:

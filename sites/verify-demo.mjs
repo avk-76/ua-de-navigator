@@ -38,7 +38,18 @@ const route = await api("/api/onboarding/route", {
 assert.equal(route.body.route.authority_track.label, "Jobcenter");
 assert.equal(route.body.route.source_freshness, "review_required");
 assert.equal((await api("/api/leads/register", { method: "POST" })).status, 503);
-assert.equal((await api("/api/extract", { method: "POST", body: { get: () => ({ name: "letter.txt", text: async () => "sample text" }) } })).body.text, "sample text");
+assert.equal((await api("/api/extract", { method: "POST" })).status, 410);
+const localDocument = { currentScript: { src: "https://example.test/local-document.js" }, querySelector: () => null };
+const localWindow = {};
+runInNewContext(readFileSync(new URL("local-document.js", root), "utf8"), {
+  window: localWindow, document: localDocument, URL, console,
+});
+const redacted = localWindow.uaDeLocalDocument.redact("Jobcenter Berlin\nFrau Anna Muster\nMusterstraße 5\nanna@example.com\n+49 170 12345678");
+assert.ok(redacted.includes("Jobcenter Berlin"));
+assert.ok(!redacted.includes("Anna Muster"));
+assert.ok(!redacted.includes("Musterstraße 5"));
+assert.ok(!redacted.includes("anna@example.com"));
+assert.ok(!redacted.includes("12345678"));
 const letter = "Jobcenter Bodenseekreis\nAktenzeichen: JC/2026/4711\nAufforderung zur Mitwirkung\nBitte reichen Sie Kontoauszüge und Mietvertrag bis zum 17.10.2026 ein.";
 const preview = await api("/api/documents/analyze", { method: "POST", body: JSON.stringify({ text: letter }) });
 assert.equal(preview.body.analysis.deadline.extracted_due_at, "2026-10-17");

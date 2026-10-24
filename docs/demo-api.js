@@ -1,23 +1,58 @@
-/* Static showcase adapter. No visitor data is sent to an API or stored on a server. */
+/* Static demo adapter; when configured, authenticated state is stored per user in Supabase. */
 (() => {
-  window.uaDeStaticDemo = true;
+  const cloud = window.uaDeCloud;
+  window.uaDeStaticDemo = !cloud?.configured;
   const nativeFetch = window.fetch.bind(window);
   const fixturePromise = nativeFetch("./demo-fixtures.json").then((response) => {
     if (!response.ok) throw new Error("Demo fixtures unavailable");
     return response.json();
   });
-  let statePromise = fixturePromise.then((data) => structuredClone(data));
   let onboarding = null;
+  let lastDocumentAnalysis = null;
+  let currentSources = [];
+  window.uaDeSourceRefresh?.then((result) => { currentSources = result.sources || []; }).catch(() => {});
+  async function loadState() {
+    const fixture = structuredClone(await fixturePromise);
+    if (!cloud?.configured) return fixture;
+    await cloud.ready;
+    if (!cloud.user) return fixture;
+    const saved = await cloud.getState();
+    if (saved && Object.keys(saved).length) {
+      onboarding = saved.onboarding || null;
+      return { ...fixture, ...saved, region_details: fixture.region_details, regions: fixture.regions };
+    }
+    fixture.cases = [];
+    fixture.case_details = {};
+    fixture.deadlines = [];
+    fixture.dashboard.active_cases = [];
+    fixture.dashboard.actions = [];
+    fixture.dashboard.waiting = [];
+    fixture.dashboard.nearest_deadline = null;
+    fixture.profile = { preferred_language: cloud.user.user_metadata?.preferred_language || "ru",
+      federal_state: cloud.user.user_metadata?.federal_state || "", city: "",
+      arrival_date: null, completion_percent: 0 };
+    return fixture;
+  }
+  let statePromise = loadState();
+  window.addEventListener("ua-de:authchange", () => { statePromise = loadState(); });
 
   const banner = document.createElement("div");
   banner.className = "demo-banner";
   banner.setAttribute("role", "note");
   document.querySelector(".app-shell")?.prepend(banner);
   const notice = {
-    ru: "<strong>Публичная демоверсия.</strong> Дела и профиль вымышлены. Изменения видны только в этой вкладке. Регистрация, ИИ, OCR и проверка официальных источников не подключены. Не вводите личные данные.",
-    uk: "<strong>Публічна демоверсія.</strong> Справи й профіль вигадані. Зміни видно лише в цій вкладці. Реєстрація, ШІ, OCR та перевірка офіційних джерел не підключені. Не вводьте особисті дані.",
-    de: "<strong>Öffentliche Demo.</strong> Fälle und Profil sind erfunden. Änderungen gelten nur in diesem Tab. Registrierung, KI, OCR und Prüfung amtlicher Quellen sind nicht angeschlossen. Keine persönlichen Daten eingeben.",
-    en: "<strong>Public demo.</strong> Cases and profile are fictional. Changes last only in this tab. Registration, AI, OCR and official source checks are not connected. Do not enter personal data.",
+    ru: cloud?.configured
+      ? "<strong>Тестовая версия.</strong> Проверяйте сроки и требования по оригиналу письма и сайту ведомства. Вход защищён подтверждением почты."
+      : "<strong>Публичная демоверсия.</strong> Дела и профиль вымышлены. OCR работает в браузере. Регистрация, живой ИИ и онлайн-проверка источников пока не подключены. Не вводите личные данные.",
+    uk: cloud?.configured
+      ? "<strong>Тестова версія.</strong> Перевіряйте строки й вимоги за оригіналом листа та сайтом відомства. Вхід підтверджується поштою."
+      : "<strong>Публічна демоверсія.</strong> Справи й профіль вигадані. OCR працює в браузері. Реєстрація, ШІ та онлайн-перевірка джерел ще не підключені. Не вводьте особисті дані.",
+    de: cloud?.configured
+      ? "<strong>Testversion.</strong> Prüfen Sie Fristen und Anforderungen am Originalschreiben und bei der Behörde. Der Zugang wird per E-Mail bestätigt."
+      : "<strong>Öffentliche Demo.</strong> Fälle und Profil sind erfunden. OCR läuft im Browser. Registrierung, KI und Online-Quellenprüfung sind noch nicht angeschlossen. Keine persönlichen Daten eingeben.",
+    en: cloud?.configured
+      ? "<strong>Test version.</strong> Check deadlines and requirements against the original letter and authority website. Access is confirmed by email."
+      : "<strong>Public demo.</strong> Cases and profile are fictional. OCR runs in the browser. Registration, live AI and online source checks are not connected yet. Do not enter personal data.",
   };
   const updateBanner = () => {
     banner.innerHTML = notice[document.querySelector("#languageSelect")?.value] || notice.ru;
@@ -96,9 +131,12 @@
         { title: "Соберите исходные документы", description: "Подтвердите статус, адрес, семейный состав и финансовую ситуацию." },
         { title: "Уточните порядок в выбранном ведомстве", description: "Проверьте актуальные условия перед подачей заявления." },
       ],
-      source_freshness: "review_required",
-      sources: [],
-      notice: "Это демонстрационный маршрут, не решение ведомства. Источники и сроки в облачной демоверсии не проверяются.",
+      source_freshness: cloud?.configured && currentSources.length && currentSources.every((source) => source.status === "verified_online")
+        ? "fresh" : "review_required",
+      sources: cloud?.configured ? currentSources : [],
+      notice: cloud?.configured
+        ? "Маршрут предварительный. Официальные страницы проверены на доступность; условия и сроки нужно сверить перед обращением в ведомство."
+        : "Это демонстрационный маршрут, не решение ведомства. Источники и сроки в облачной демоверсии не проверяются.",
     };
   };
 
@@ -172,14 +210,25 @@
     if (options.body && typeof options.body === "string") {
       try { body = JSON.parse(options.body); } catch { body = {}; }
     }
+    if (cloud?.configured && !cloud.user &&
+        /^\/api\/(dashboard|cases|deadlines|profile|checklist|documents\/attach)/.test(path)) {
+      return reply({ ok: false, error: "Войдите в личный кабинет." }, 401);
+    }
+    async function run() {
     if (path === "/api/dashboard" && method === "GET") return reply({ ok: true, dashboard: dashboard(state) });
     if (path === "/api/cases" && method === "GET") return reply({ ok: true, cases: state.cases });
     if (path === "/api/documents/analyze" && method === "POST") {
-      const analysis = analyze(body.text || "");
+      const analysis = cloud?.configured
+        ? (await cloud.invoke("document", { text: body.text || "", language: document.querySelector("#languageSelect")?.value || "ru" })).analysis
+        : analyze(body.text || "");
+      if (cloud?.configured) lastDocumentAnalysis = { text: body.text, analysis };
       return reply({ ok: true, analysis, matches: matchesFor(state, analysis) });
     }
     if (path === "/api/documents/attach" && method === "POST") {
-      const analysis = analyze(body.text || "");
+      const analysis = cloud?.configured
+        ? lastDocumentAnalysis?.text === body.text ? lastDocumentAnalysis.analysis
+          : (await cloud.invoke("document", { text: body.text || "", language: document.querySelector("#languageSelect")?.value || "ru" })).analysis
+        : analyze(body.text || "");
       let detail = body.case_id ? state.case_details[body.case_id] : null;
       if (body.case_id && !detail) return reply({ ok: false, error: "Case not found" }, 404);
       if (detail && detail.authority_type !== analysis.authority_type)
@@ -241,9 +290,13 @@
       onboarding = { answers: body.answers || {}, route_result: route };
       return reply({ ok: true, route, onboarding });
     }
-    if (path === "/api/official-sources" && method === "GET") return reply({ ok: true, sources: [] });
+    if (path === "/api/official-sources" && method === "GET") return reply(cloud?.configured
+      ? await window.uaDeSourceRefresh : { ok: true, sources: [] });
     if (path === "/api/official-sources/refresh" && method === "POST") {
-      return reply({ ok: true, sources: [], route: onboarding ? routeFor(onboarding.answers) : null });
+      const result = cloud?.configured ? await cloud.invoke("sources") : { sources: [] };
+      currentSources = result.sources || [];
+      window.uaDeSourceRefresh = Promise.resolve(result);
+      return reply({ ok: true, sources: result.sources, route: onboarding ? routeFor(onboarding.answers) : null });
     }
     if (path === "/api/guest/question" && method === "POST") {
       return reply({ ok: true, answer: {
@@ -257,12 +310,7 @@
       return reply({ ok: false, error: "Регистрация недоступна в публичной демоверсии." }, 503);
     }
     if (path === "/api/extract" && method === "POST") {
-      const file = options.body?.get?.("file");
-      if (!file) return reply({ ok: false, message: "Файл не выбран." }, 400);
-      if (!/\.txt$/i.test(file.name)) {
-        return reply({ ok: false, message: "В облачной демоверсии можно открыть только TXT. PDF и OCR доступны в локальном прототипе." });
-      }
-      return reply({ ok: true, text: await file.text(), message: `Текст ${file.name} открыт только в этом браузере.` });
+      return reply({ ok: false, error: "Файл обрабатывается только на устройстве клиента." }, 410);
     }
     const deadlineMatch = path.match(/^\/api\/deadlines\/([^/]+)$/);
     if (deadlineMatch && method === "PATCH") {
@@ -340,6 +388,14 @@
       return reply({ ok: true, item });
     }
     return reply({ ok: false, error: "Функция недоступна в публичной демоверсии." }, 503);
+    }
+    const response = await run();
+    if (cloud?.configured && cloud.user && response.ok && method !== "GET" &&
+        !["/api/documents/analyze", "/api/official-sources/refresh"].includes(path)) {
+      state.onboarding = onboarding;
+      await cloud.saveState(state);
+    }
+    return response;
   }
 
   window.fetch = (input, options) => {

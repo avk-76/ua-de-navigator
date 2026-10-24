@@ -88,4 +88,4 @@ provider: локальный rule-based прототип намеренно не
 - `POST /api/official-sources/refresh` — немедленная онлайн-проверка источников;
 - `POST /api/leads/register` — сохранение лида и назначение стартовых лимитов;
 - `POST /api/guest/question` — первый бесплатный структурированный ответ;
-- `POST /api/extract` — загрузка и извлечение текста документа.
+- OCR для TXT/PDF/изображений выполняется в браузере; `POST /api/extract` отключён.

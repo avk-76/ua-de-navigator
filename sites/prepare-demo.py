@@ -11,9 +11,10 @@ from pathlib import Path
 
 
 SITE = Path(__file__).resolve().parent
-ROOT = SITE.parents[1]
+ROOT = SITE.parent
 DIST = SITE / "dist"
 PROTOTYPE = ROOT / "prototype"
+PUBLISHED = ROOT / "docs"
 sys.path.insert(0, str(ROOT / "backend"))
 
 from storage import NavigatorStore  # noqa: E402
@@ -25,6 +26,10 @@ def main() -> None:
     for source in PROTOTYPE.iterdir():
         if source.is_file() and source.suffix in {".html", ".css", ".js"}:
             shutil.copy2(source, DIST / source.name)
+    if (PROTOTYPE / "vendor").is_dir():
+        shutil.copytree(PROTOTYPE / "vendor", DIST / "vendor", dirs_exist_ok=True)
+    for name in ("demo-api.js", "demo.css"):
+        shutil.copy2(PUBLISHED / name, DIST / name)
 
     with tempfile.TemporaryDirectory(prefix="uade-public-demo-", dir=SITE) as temp_dir:
         store = NavigatorStore(Path(temp_dir) / "synthetic.db")

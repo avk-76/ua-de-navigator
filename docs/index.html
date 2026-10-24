@@ -23,22 +23,37 @@
           </button>
 
           <nav class="quiet-nav" aria-label="Основная навигация">
-            <button type="button" data-route="welcome">Маршрут</button>
-            <button type="button" data-route="home">Кабинет</button>
-            <button type="button" data-route="cases" data-i18n="navCases">Мои дела</button>
-            <button type="button" data-route="deadlines" data-i18n="navDeadlines">Сроки</button>
-            <button type="button" data-route="profile">Профиль</button>
+            <button type="button" data-start-route>Персональный маршрут</button>
+            <button type="button" data-route="document">Разобрать документ</button>
+            <button type="button" data-open-question>Ваш ИИ-помощник</button>
           </nav>
 
-          <label class="language-switch">
-            <span class="sr-only" data-i18n="interfaceLanguage">Язык интерфейса</span>
-            <select id="languageSelect" aria-label="Язык интерфейса">
-              <option value="ru">RU</option>
-              <option value="uk">UA</option>
-              <option value="de">DE</option>
-              <option value="en">EN</option>
-            </select>
-          </label>
+          <div class="header-tools">
+            <label class="language-switch">
+              <span class="sr-only" data-i18n="interfaceLanguage">Язык интерфейса</span>
+              <select id="languageSelect" aria-label="Язык интерфейса">
+                <option value="ru">RU</option>
+                <option value="uk">UA</option>
+                <option value="de">DE</option>
+                <option value="en">EN</option>
+              </select>
+            </label>
+            <details class="account-menu">
+              <summary aria-label="Личный кабинет" title="Личный кабинет">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="3.3" />
+                  <path d="M5.3 20c.5-3.7 3-5.5 6.7-5.5s6.2 1.8 6.7 5.5" />
+                </svg>
+              </summary>
+              <div class="account-menu-panel">
+                <button type="button" data-route="home">Личный кабинет</button>
+                <button type="button" data-route="cases" data-i18n="navCases">Мои дела</button>
+                <button type="button" data-route="deadlines" data-i18n="navDeadlines">Сроки</button>
+                <button type="button" data-route="profile">Профиль</button>
+                <button type="button" id="accountSignOut" hidden>Выйти</button>
+              </div>
+            </details>
+          </div>
         </header>
 
         <section class="app-view is-active onboarding-view" data-view="welcome">
@@ -65,16 +80,16 @@
               </div>
             </div>
             <aside class="onboarding-hero-aside welcome-pack-preview">
-              <p class="section-label">БЕСПЛАТНЫЙ СТАРТОВЫЙ ПАКЕТ</p>
+              <p class="section-label">ПЕРВЫЕ ШАГИ БЕЗ РЕГИСТРАЦИИ</p>
               <div class="welcome-pack-number">
-                <strong>3</strong>
-                <span>разбора писем и документов<br />первый — до регистрации</span>
+                <strong>01</strong>
+                <span>Разберите письмо<br />сначала проверьте текст</span>
               </div>
               <div class="welcome-pack-number">
-                <strong>5</strong>
-                <span>персональных ответов<br />первый — прямо сейчас</span>
+                <strong>02</strong>
+                <span>Задайте вопрос<br />без личных данных</span>
               </div>
-              <p class="welcome-pack-note">Первую помощь можно проверить без регистрации. Остальное сохранится в бесплатном кабинете.</p>
+              <p class="welcome-pack-note">Для сохранения дел потребуется подтверждение почты.</p>
             </aside>
           </header>
 
@@ -187,32 +202,46 @@
             <div class="guest-answer-conversion">
               <div>
                 <strong>Ответ помог?</strong>
-                <span>Сохраните его и получите ещё 4 бесплатных вопроса в кабинете.</span>
+                <span>Создайте кабинет, чтобы продолжить работу с вашими делами.</span>
               </div>
               <button class="primary-button" type="button" data-question-register>
-                <span>Сохранить ответ бесплатно</span><span aria-hidden="true">→</span>
+                <span>Создать кабинет</span><span aria-hidden="true">→</span>
               </button>
             </div>
           </section>
 
           <section class="guest-lead-capture" id="guestLeadCapture" hidden>
             <div>
-              <p class="section-label">ЕЩЁ 4 БЕСПЛАТНЫХ ВОПРОСА</p>
-              <h2>Сохраните ответ в личном кабинете</h2>
-              <p>Мы сохраним контекст вопроса, чтобы вам не пришлось начинать объяснение заново.</p>
+              <p class="section-label">ЛИЧНЫЙ КАБИНЕТ</p>
+              <h2>Продолжайте работу в личном кабинете</h2>
+              <p>Подтвердите почту, чтобы хранить дела и маршрут отдельно от других клиентов.</p>
             </div>
             <form id="guestLeadForm">
               <label>
-                <span>Как к вам обращаться <small>необязательно</small></span>
-                <input type="text" name="display_name" autocomplete="name" placeholder="Имя" />
+                <span>Как к вам обращаться</span>
+                <input type="text" name="display_name" autocomplete="name" maxlength="100" placeholder="Имя" required />
               </label>
               <label>
                 <span>Email для входа</span>
                 <input type="email" name="email" autocomplete="email" placeholder="name@example.com" required />
               </label>
+              <label>
+                <span>Цель обращения</span>
+                <select name="lead_goal" required>
+                  <option value="">Выберите цель</option>
+                  <option value="route">Маршрут переезда</option>
+                  <option value="document">Разбор документа</option>
+                  <option value="question">Вопрос ИИ-помощнику</option>
+                </select>
+              </label>
+              <label>
+                <span>Федеральная земля <small>необязательно</small></span>
+                <input type="text" name="federal_state" maxlength="100" autocomplete="address-level1" placeholder="Например, Berlin" />
+              </label>
+              <p class="lead-privacy-note">Адрес и телефон для регистрации не нужны. Для входа в тестовый период используйте avk/avk и ссылку, отправленную на вашу почту.</p>
               <label class="consent-check">
                 <input type="checkbox" name="account_consent" required />
-                <span>Согласен(на) на создание кабинета и сохранение вопроса. Передача данных специалисту требует отдельного согласия.</span>
+                <span>Согласен(на) на создание кабинета и хранение моих данных. Передача данных специалисту требует отдельного согласия.</span>
               </label>
               <p class="lead-form-status" id="guestLeadStatus" role="status"></p>
               <button class="primary-button" type="submit">
@@ -307,7 +336,7 @@
             <div class="process-steps">
               <article><span>01</span><strong>Расскажите о ситуации</strong><p>Без имени, телефона и загрузки документов.</p></article>
               <article><span>02</span><strong>Получите свой маршрут</strong><p>Конкретные первые шаги и полезные подсказки.</p></article>
-              <article><span>03</span><strong>Сохраните продолжение</strong><p>Бесплатный кабинет, 3 разбора документов и 5 вопросов ИИ.</p></article>
+              <article><span>03</span><strong>Сохраните продолжение</strong><p>Личный кабинет с делами, маршрутом и историей действий.</p></article>
             </div>
             <button class="primary-button process-cta" type="button" data-start-route>
               <span>Начать бесплатный тест</span>
@@ -642,12 +671,12 @@
 
             <section class="lead-capture" id="leadCapture">
               <div class="lead-offer">
-                <p class="section-label">ВАШ БЕСПЛАТНЫЙ СТАРТОВЫЙ ПАКЕТ</p>
+                <p class="section-label">ВАШ ЛИЧНЫЙ КАБИНЕТ</p>
                 <h2 id="leadCaptureTitle">Сохраните маршрут и продолжайте в личном кабинете</h2>
-                <p>После регистрации маршрут не потеряется, а бесплатные возможности будут доступны сразу.</p>
+                <p>После подтверждения почты сохраняйте маршрут, документы и следующие действия.</p>
                 <div class="lead-benefits">
-                  <div><strong>3</strong><span>полных перевода документов с анализом требований и сроков</span></div>
-                  <div><strong>5</strong><span>персональных ответов ИИ на вопрос «Что делать дальше?»</span></div>
+                  <div><strong>✓</strong><span>разбор текста документа с анализом требований и сроков</span></div>
+                  <div><strong>✓</strong><span>ответы ИИ на вопрос «Что делать дальше?» с проверкой источников</span></div>
                 </div>
                 <ul>
                   <li>Персональный чек-лист и календарь действий</li>
@@ -658,13 +687,27 @@
               <form class="lead-form" id="leadForm">
                 <input type="hidden" name="requested_support" id="requestedSupport" value="" />
                 <label>
-                  <span>Как к вам обращаться <small>необязательно</small></span>
-                  <input type="text" name="display_name" autocomplete="name" placeholder="Имя" />
+                  <span>Как к вам обращаться</span>
+                  <input type="text" name="display_name" autocomplete="name" maxlength="100" placeholder="Имя" required />
                 </label>
                 <label>
                   <span>Email для входа в кабинет</span>
                   <input type="email" name="email" autocomplete="email" placeholder="name@example.com" required />
                 </label>
+                <label>
+                  <span>Цель обращения</span>
+                  <select name="lead_goal" required>
+                    <option value="">Выберите цель</option>
+                    <option value="route">Маршрут переезда</option>
+                    <option value="document">Разбор документа</option>
+                    <option value="question">Вопрос ИИ-помощнику</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Федеральная земля <small>необязательно</small></span>
+                  <input type="text" name="federal_state" maxlength="100" autocomplete="address-level1" placeholder="Например, Berlin" />
+                </label>
+                <p class="lead-privacy-note">Адрес и телефон для регистрации не нужны. В тестовый период используйте avk/avk и подтвердите вход через почту.</p>
                 <label class="consent-check">
                   <input type="checkbox" name="account_consent" required />
                   <span>Согласен(на) на создание кабинета и обработку данных для сохранения маршрута. Данные не передаются специалистам без отдельного согласия.</span>
@@ -706,16 +749,16 @@
 
           <section class="welcome-credits" id="welcomeCredits" hidden>
             <div>
-              <p class="section-label">БЕСПЛАТНЫЙ СТАРТОВЫЙ ПАКЕТ АКТИВЕН</p>
+              <p class="section-label">ЛИЧНЫЙ КАБИНЕТ АКТИВЕН</p>
               <h2>Маршрут сохранён. Можно переходить к реальным задачам.</h2>
             </div>
             <div class="credit-meter">
-              <strong>3</strong>
-              <span>разбора документов</span>
+              <strong>✓</strong>
+              <span>разбор документов</span>
             </div>
             <div class="credit-meter">
-              <strong>5</strong>
-              <span>вопросов «Что делать?»</span>
+              <strong>✓</strong>
+              <span>вопросы «Что делать?»</span>
             </div>
           </section>
 
@@ -1049,7 +1092,7 @@
             </div>
 
             <label class="drop-zone">
-              <input id="fileInput" type="file" accept=".txt,text/plain,.pdf,application/pdf,image/*" />
+              <input id="fileInput" type="file" accept=".txt,text/plain,.pdf,application/pdf,image/png,image/jpeg,image/webp,image/bmp,image/gif" />
               <span class="drop-icon">＋</span>
               <span class="drop-copy">
                 <strong data-i18n="uploadButton">Выбрать PDF, фото или текст</strong>
@@ -1058,7 +1101,7 @@
             </label>
 
             <textarea id="documentInput" spellcheck="false"></textarea>
-            <p class="privacy-note">Используйте только вымышленные данные в публичном демо. В локальном кабинете письмо сохраняется после выбора дела.</p>
+            <p class="privacy-note">Файл распознаётся на вашем устройстве. Перед анализом проверьте текст без личных данных.</p>
 
             <div class="sample-row">
               <span data-i18n="samplesTitle">Попробовать пример:</span>
@@ -1281,19 +1324,54 @@
       </section>
     </main>
 
-    <nav class="mobile-nav" aria-label="Мобильная навигация">
-      <button type="button" data-route="welcome"><span>⌂</span>Маршрут</button>
-      <button type="button" data-route="home"><span>◇</span>Кабинет</button>
-      <button type="button" data-route="cases"><span>□</span>Дела</button>
-      <button type="button" data-route="deadlines"><span>◷</span>Сроки</button>
-      <button type="button" data-route="profile"><span>○</span>Профиль</button>
-    </nav>
+    <dialog id="privacyReviewDialog" class="privacy-review-dialog" aria-labelledby="privacyReviewTitle">
+      <form id="privacyReviewForm" method="dialog">
+        <p class="section-label">ПРОВЕРКА ПЕРЕД ОТПРАВКОЙ</p>
+        <h2 id="privacyReviewTitle">Проверьте обезличенный текст</h2>
+        <p>Файл и исходный текст остаются на вашем устройстве. Удалите из текста ниже ФИО, адреса, телефоны, email, номера дела и другие личные данные. Даты, параграфы, требования и название ведомства сохраните.</p>
+        <label for="privacyReviewText">Текст, который получит ИИ</label>
+        <textarea id="privacyReviewText" rows="13" spellcheck="false"></textarea>
+        <label class="consent-check">
+          <input id="privacyReviewConfirm" type="checkbox" required />
+          <span>Я проверил(а), что в тексте не осталось личных данных.</span>
+        </label>
+        <p id="privacyReviewError" class="lead-form-status" role="status"></p>
+        <div class="privacy-review-actions">
+          <button class="secondary-button" type="button" id="privacyReviewCancel">Отмена</button>
+          <button class="primary-button" type="submit" value="send">Передать обезличенный текст</button>
+        </div>
+      </form>
+    </dialog>
 
+    <dialog id="accountLoginDialog" class="privacy-review-dialog" aria-labelledby="accountLoginTitle">
+      <form id="accountLoginForm">
+        <p class="section-label">ЛИЧНЫЙ КАБИНЕТ</p>
+        <h2 id="accountLoginTitle">Войти в кабинет</h2>
+        <p>В тестовый период у всех логин и пароль avk/avk. Для доступа именно к вашему кабинету подтвердите вход по личной почте.</p>
+        <label for="accountLoginName">Логин</label>
+        <input id="accountLoginName" name="test_login" autocomplete="username" value="avk" required />
+        <label for="accountLoginPassword">Пароль</label>
+        <input id="accountLoginPassword" name="test_password" type="password" autocomplete="current-password" required />
+        <label for="accountLoginEmail">Ваша почта</label>
+        <input id="accountLoginEmail" name="email" type="email" autocomplete="email" required />
+        <p id="accountLoginStatus" class="lead-form-status" role="status"></p>
+        <div class="privacy-review-actions">
+          <button class="secondary-button" type="button" id="accountLoginCancel">Отмена</button>
+          <button class="primary-button" type="submit">Отправить ссылку для входа</button>
+        </div>
+      </form>
+      <p>Новый клиент? <button class="text-button" type="button" id="accountCreateButton">Создать кабинет</button></p>
+    </dialog>
+
+    <script src="./cloud-config.js"></script>
+    <script src="./cloud-client.js"></script>
+    <script src="./account.js"></script>
     <script src="./demo-api.js"></script>
     <script src="./portal.js?v=20261022-card"></script>
     <script src="./guest-tools.js"></script>
     <script src="./onboarding.js"></script>
     <script src="./regional-support.js"></script>
+    <script src="./local-document.js"></script>
     <script src="./app.js"></script>
     <script src="./site-i18n.js?v=20261022-card"></script>
   </body>

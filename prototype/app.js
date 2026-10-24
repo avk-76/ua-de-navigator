@@ -826,20 +826,18 @@ fileInput.addEventListener("change", async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
   const t = ui[getLang()];
-
-  if (isBackendMode()) {
+  try {
+    if (!window.uaDeLocalDocument) throw new Error("Локальное распознавание недоступно");
+    documentInput.value = await window.uaDeLocalDocument.extract(file, (message) => {
+      statusPill.textContent = message;
+    });
+    // The file and its original name must never be sent to an API.
+    uploadedFileContext = { stored_as: null, file_name: "Локальный документ", mime_type: "text/plain" };
+    documentPreview = null;
     statusPill.textContent = t.loaded(file.name);
-    await extractViaBackend(file);
-    return;
+  } catch (error) {
+    statusPill.textContent = error.message;
   }
-
-  if (file.type === "text/plain" || file.name.toLowerCase().endsWith(".txt")) {
-    documentInput.value = await file.text();
-    statusPill.textContent = t.loaded(file.name);
-    return;
-  }
-
-  statusPill.textContent = t.selectedNeedsOcr(file.name);
 });
 
 documentInput.addEventListener("input", () => {
@@ -864,6 +862,16 @@ async function analyzeCurrentDocument() {
     return;
   }
 
+  let transferText;
+  try {
+    if (!window.uaDeLocalDocument) throw new Error("Проверка личных данных недоступна");
+    transferText = await window.uaDeLocalDocument.reviewForTransfer(text);
+    if (!transferText) return;
+  } catch (error) {
+    statusPill.textContent = error.message;
+    return;
+  }
+
   const extracted = extractFields(text, lang);
   const risk = decideRisk(text, extracted, lang);
   const sendItems = buildSendChecklist(extracted, risk, lang);
@@ -878,11 +886,11 @@ async function analyzeCurrentDocument() {
   try {
     const response = await fetch("/api/documents/analyze", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text: transferText }),
     });
     const payload = await response.json();
     if (!response.ok || !payload.ok) throw new Error(payload.error || "Анализ недоступен");
-    documentPreview = { analysis: payload.analysis, matches: payload.matches || [], text };
+    documentPreview = { analysis: payload.analysis, matches: payload.matches || [], text: transferText };
     // The case engine is the source for deadline and obligation candidates.
     // Keep the local translator, but do not let its illustrative rules
     // override the persisted case checklist.
@@ -976,30 +984,6 @@ function applyInterfaceLanguage() {
   });
   if (!statusPill.textContent || Object.values(ui).some((x) => x.localPrototype === statusPill.textContent)) {
     statusPill.textContent = dict.localPrototype;
-  }
-}
-
-function isBackendMode() {
-  return location.protocol === "http:" || location.protocol === "https:";
-}
-
-async function extractViaBackend(file) {
-  const form = new FormData();
-  form.append("file", file);
-  try {
-    const response = await fetch("/api/extract", {
-      method: "POST",
-      body: form,
-    });
-    const result = await response.json();
-    if (result.text) {
-      documentInput.value = result.text;
-      uploadedFileContext = { stored_as: result.stored_as, file_name: file.name, mime_type: file.type };
-    }
-    statusPill.textContent = result.message || (result.ok ? ui[getLang()].loaded(file.name) : ui[getLang()].selectedNeedsOcr(file.name));
-    if (result.ok && result.text) await analyzeCurrentDocument();
-  } catch (error) {
-    statusPill.textContent = `Upload failed: ${error.message}`;
   }
 }
 

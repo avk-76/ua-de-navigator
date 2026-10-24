@@ -6,3 +6,5 @@ backend/uploads/
 backend/server.*.log
 .env
 .env.*
+node_modules/
+sites/dist/

@@ -7,7 +7,7 @@ Existing UA-DE Navigator prototype with three entry points: a personal route, a 
 - [Interactive synthetic demo](https://avk-76.github.io/ua-de-navigator/)
 - [Site deployment](https://ua-de-navigator-demo.ak-bimmer.chatgpt.site/)
 
-The online demo runs in the browser with invented cases. It has no account, persistent storage, server-side document processing, OCR, or live AI. Edits reset on reload. Do not enter real personal documents.
+The published version remains a synthetic demo until the separate Supabase project is fully configured and deployed. OCR for German image letters and scanned PDFs runs in the browser; visitors review redacted text before it is sent for analysis. Without the cloud configuration, registration and live AI are explicitly disabled. Do not enter real personal documents in the demo.
 
 ## Run locally
 
@@ -17,7 +17,18 @@ From this repository:
 python backend/server.py
 ```
 
-Open `http://127.0.0.1:8787/prototype/`. The local server stores SQLite data and uploads on the local machine. Keep those files out of public repositories.
+Open `http://127.0.0.1:8787/prototype/`. The local server stores SQLite case data on the local machine. Files are read in the browser; the raw upload endpoint is disabled. Keep local data out of public repositories.
+
+To rebuild browser OCR and the Supabase client before preparing a static release:
+
+```powershell
+npm ci
+npm run build:ocr
+npm run build:cloud
+python sites/prepare-demo.py
+```
+
+The separate cloud project's setup is documented in [supabase/DEPLOYMENT.md](supabase/DEPLOYMENT.md).
 
 ## Verify
 
@@ -31,4 +42,4 @@ The public demo source is in `docs/`. It is generated from `prototype/` by `site
 
 ## Current limits
 
-Document extraction supports text files and text-layer PDFs; scanned PDFs and photos need OCR. The rule-based document reading proposes dates and required attachments for human confirmation. Official links are entry points and should be checked against the current authority page. This prototype does not provide legal advice or send replies to authorities.
+Automatic redaction can miss personal identifiers, so the visitor must review the text before transfer. The rule-based local document reading proposes dates and required attachments for human confirmation. An online source check confirms availability and detects page changes; it cannot itself validate legal meaning. This navigator does not provide legal advice or send replies to authorities.

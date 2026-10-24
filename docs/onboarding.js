@@ -122,6 +122,7 @@
     nextButton.querySelector("span:first-child").textContent = "Проверяем источники…";
     validation.textContent = "Собираем маршрут и проверяем актуальность.";
     try {
+      if (window.uaDeCloud?.configured) await window.uaDeSourceRefresh;
       const payload = await apiRequest("/api/onboarding/route", {
         method: "POST",
         body: JSON.stringify({ answers: collectAnswers() }),
@@ -270,10 +271,10 @@
     refreshSourcesButton.disabled = true;
     refreshSourcesButton.textContent = "Проверяем официальные страницы…";
     try {
-      await apiRequest("/api/official-sources/refresh", {
-        method: "POST",
-        body: JSON.stringify({}),
-      });
+      if (window.uaDeCloud?.configured) {
+        window.uaDeSourceRefresh = window.uaDeCloud.invoke("sources");
+        await window.uaDeSourceRefresh;
+      } else await apiRequest("/api/official-sources/refresh", { method: "POST", body: "{}" });
       await buildRoute();
     } catch (error) {
       validation.textContent = `Онлайн-проверка не завершена: ${error.message}`;
@@ -285,6 +286,7 @@
 
   document.querySelectorAll("[data-start-route]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (document.body.dataset.portalView !== "welcome") navigatePortal("welcome", { instant: true });
       routeBuilder.hidden = false;
       routeBuilder.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -324,42 +326,21 @@
     if (submitButton?.querySelector("span:first-child")) {
       submitButton.querySelector("span:first-child").textContent = "Создаём кабинет…";
     }
-    if (leadFormStatus) leadFormStatus.textContent = "Сохраняем маршрут и бесплатный пакет.";
+    if (leadFormStatus) leadFormStatus.textContent = "Отправляем письмо для подтверждения почты.";
 
     const data = new FormData(leadForm);
     try {
-      const payload = await apiRequest("/api/leads/register", {
-        method: "POST",
-        body: JSON.stringify({
-          email: data.get("email"),
-          display_name: data.get("display_name"),
-          preferred_language: document.querySelector("#languageSelect")?.value || "ru",
-          session_id: window.uaDeGuestSessionId || localStorage.getItem("ua-de-guest-session") || "",
-          requested_support: data.get("requested_support") || "",
-          consent_flags: {
-            account: data.get("account_consent") === "on",
-            product_updates: data.get("updates_consent") === "on",
-            partner_transfer: false,
-          },
-        }),
+      if (!window.uaDeCloud?.configured) throw new Error("Регистрация пока не подключена к Supabase.");
+      await window.uaDeCloud.requestEmail(String(data.get("email")).trim().toLowerCase(), {
+        display_name: String(data.get("display_name")).trim(),
+        preferred_language: document.querySelector("#languageSelect")?.value || "ru",
+        federal_state: String(data.get("federal_state") || "").trim(),
+        lead_goal: String(data.get("lead_goal")),
+        lead_source: "route",
+        updates_consent: data.get("updates_consent") === "on",
+        account_consent: data.get("account_consent") === "on",
       });
-      const translations = payload.welcome_pack?.translation_credits ?? 3;
-      const questions = payload.welcome_pack?.ai_question_credits ?? 5;
-      localStorage.setItem("ua-de-lead-email", String(data.get("email") || ""));
-      const welcomeCredits = document.querySelector("#welcomeCredits");
-      if (welcomeCredits) welcomeCredits.hidden = false;
-      leadCapture?.classList.add("is-complete");
-      leadForm.innerHTML = `
-        <div class="lead-success">
-          <span class="choice-mark">✓</span>
-          <strong>Кабинет создан</strong>
-          <p>Маршрут сохранён. Вам доступны ${translations} разбора документов и ${questions} ответов ИИ.</p>
-          <button class="primary-button" type="button" data-route="home">
-            <span>Открыть личный кабинет</span>
-            <span aria-hidden="true">→</span>
-          </button>
-        </div>
-      `;
+      if (leadFormStatus) leadFormStatus.textContent = "Письмо отправлено. Перейдите по ссылке из письма, чтобы подтвердить почту и открыть кабинет.";
     } catch (error) {
       if (leadFormStatus) leadFormStatus.textContent = error.message;
       if (submitButton) submitButton.disabled = false;
@@ -376,8 +357,10 @@
     if (currentRoute) renderRoute(currentRoute);
   });
   const welcomeCredits = document.querySelector("#welcomeCredits");
-  if (welcomeCredits && localStorage.getItem("ua-de-lead-email")) {
-    welcomeCredits.hidden = false;
+  if (welcomeCredits) {
+    const showCredits = () => { welcomeCredits.hidden = !window.uaDeCloud?.user; };
+    window.uaDeCloud?.ready.then(showCredits).catch(() => {});
+    window.addEventListener("ua-de:authchange", showCredits);
   }
   restoreOnboarding();
 })();
