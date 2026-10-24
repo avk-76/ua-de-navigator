@@ -67,6 +67,9 @@ grant usage on schema public to anon, authenticated;
 grant select, update on public.navigator_profiles to authenticated;
 grant select, insert, update on public.navigator_state to authenticated;
 grant select on public.navigator_sources to anon, authenticated;
+grant select, insert, update on public.navigator_sources,
+  public.navigator_source_checks, public.navigator_ai_usage to service_role;
+grant usage, select on sequence public.navigator_source_checks_id_seq to service_role;
 
 create policy navigator_profiles_read_own on public.navigator_profiles
   for select to authenticated using (auth.uid() is not null and auth.uid() = user_id);

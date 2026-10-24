@@ -176,5 +176,10 @@ Deno.serve(async (request) => {
       summary: String(analysis.summary || ""), next_action: String(analysis.next_action || "Проверьте письмо"),
       risk_level: ["green", "yellow", "red", "expert"].includes(analysis.risk_level) ? analysis.risk_level : "yellow",
     }, matches: [] }, 200, origin);
-  } catch (error) { return json({ error: String(error instanceof Error ? error.message : error) }, 500, origin); }
+  } catch (error) {
+    console.error("navigator-assist failed", error);
+    const detail = error instanceof Error ? error.message :
+      error && typeof error === "object" ? JSON.stringify(error) : String(error);
+    return json({ error: detail }, 500, origin);
+  }
 });
