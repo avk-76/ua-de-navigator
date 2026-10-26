@@ -4,10 +4,9 @@ Existing UA-DE Navigator prototype with three entry points: a personal route, a 
 
 ## View online
 
-- [Interactive synthetic demo](https://avk-76.github.io/ua-de-navigator/)
-- [Site deployment](https://ua-de-navigator-demo.ak-bimmer.chatgpt.site/)
+- [GitHub Pages test version](https://avk-76.github.io/ua-de-navigator/)
 
-The published version remains a synthetic demo until the separate Supabase project is fully configured and deployed. OCR for German image letters and scanned PDFs runs in the browser; visitors review redacted text before it is sent for analysis. Without the cloud configuration, registration and live AI are explicitly disabled. Do not enter real personal documents in the demo.
+The test version uses Supabase email confirmation and per-user storage. OCR for German image letters and scanned PDFs runs in the browser; visitors review redacted text before sending it to the server-side AI function. Automatic redaction can miss identifiers, so review the preview carefully before using real letters.
 
 ## Run locally
 
@@ -38,7 +37,7 @@ python backend/test_http_case_flow.py
 node sites/verify-demo.mjs
 ```
 
-The public demo source is in `docs/`. It is generated from `prototype/` by `sites/prepare-demo.py` using invented fixtures. `backend/` contains the local server, rules, storage, and tests.
+The GitHub Pages source is in `docs/`. It is generated from `prototype/` by `sites/prepare-demo.py` using invented fixtures for unsigned visitors. Signed-in client data is stored separately in Supabase. `backend/` contains the local server, rules, storage, and tests.
 
 ## Current limits
 

@@ -148,9 +148,9 @@ const ui = {
     handoffUserReply: "Ответ на языке пользователя",
     handoffGermanReply: "Немецкий ответ для отправки",
     downloadButton: "Скачать .md",
-    placeholder: "Вставьте сюда текст письма или загрузите .txt. PDF/фото будет принимать следующий OCR-слой.",
+    placeholder: "Вставьте текст письма или загрузите PDF, фото либо TXT. Распознавание проходит на вашем устройстве.",
     loaded: (name) => `Загружено: ${name}`,
-    selectedNeedsOcr: (name) => `Выбран файл: ${name}. Для PDF/фото нужен OCR-слой; пока вставьте текст письма ниже.`,
+    selectedNeedsOcr: (name) => `Выбран файл: ${name}. Распознаём его на вашем устройстве.`,
     sampleLoaded: (name) => `Тест-кейс: ${name}`,
     emptyText: "Сначала вставьте текст письма или загрузите .txt",
   },
@@ -231,9 +231,9 @@ const ui = {
     handoffUserReply: "Відповідь мовою користувача",
     handoffGermanReply: "Німецька відповідь для відправки",
     downloadButton: "Завантажити .md",
-    placeholder: "Вставте сюди текст листа або завантажте .txt. PDF/фото прийматиме наступний OCR-шар.",
+    placeholder: "Вставте текст листа або завантажте PDF, фото чи TXT. Розпізнавання відбувається на вашому пристрої.",
     loaded: (name) => `Завантажено: ${name}`,
-    selectedNeedsOcr: (name) => `Вибрано файл: ${name}. Для PDF/фото потрібен OCR-шар; поки вставте текст листа нижче.`,
+    selectedNeedsOcr: (name) => `Вибрано файл: ${name}. Розпізнаємо його на вашому пристрої.`,
     sampleLoaded: (name) => `Тест-кейс: ${name}`,
     emptyText: "Спочатку вставте текст листа або завантажте .txt",
   },
@@ -314,9 +314,9 @@ const ui = {
     handoffUserReply: "Antwort in Nutzersprache",
     handoffGermanReply: "Deutsche Antwort zum Versand",
     downloadButton: "Als .md laden",
-    placeholder: "Text des Schreibens einfügen oder .txt hochladen. PDF/Fotos folgen mit OCR.",
+    placeholder: "Brieftext einfügen oder PDF, Foto bzw. TXT hochladen. Die Erkennung erfolgt auf Ihrem Gerät.",
     loaded: (name) => `Geladen: ${name}`,
-    selectedNeedsOcr: (name) => `Datei gewählt: ${name}. Für PDF/Fotos wird OCR benötigt; bitte aktuell Text einfügen.`,
+    selectedNeedsOcr: (name) => `Datei gewählt: ${name}. Die Erkennung läuft auf Ihrem Gerät.`,
     sampleLoaded: (name) => `Testfall: ${name}`,
     emptyText: "Bitte zuerst Text einfügen oder .txt hochladen",
   },
@@ -397,9 +397,9 @@ const ui = {
     handoffUserReply: "Reply in user's language",
     handoffGermanReply: "German reply for sending",
     downloadButton: "Download .md",
-    placeholder: "Paste the letter text here or upload .txt. PDF/photos will be handled by the next OCR layer.",
+    placeholder: "Paste the letter text or upload a PDF, photo, or TXT. Recognition runs on your device.",
     loaded: (name) => `Loaded: ${name}`,
-    selectedNeedsOcr: (name) => `Selected file: ${name}. PDF/photos need OCR; for now paste the letter text below.`,
+    selectedNeedsOcr: (name) => `Selected file: ${name}. Recognition runs on your device.`,
     sampleLoaded: (name) => `Test case: ${name}`,
     emptyText: "First paste letter text or upload .txt",
   },
@@ -832,7 +832,8 @@ fileInput.addEventListener("change", async (event) => {
       statusPill.textContent = message;
     });
     // The file and its original name must never be sent to an API.
-    uploadedFileContext = { stored_as: null, file_name: "Локальный документ", mime_type: "text/plain" };
+    uploadedFileContext = { stored_as: null, file_name: "Обезличенный документ", mime_type: file.type ||
+      (/\.pdf$/i.test(file.name) ? "application/pdf" : /\.(png|jpe?g|webp|bmp|gif)$/i.test(file.name) ? "image/unknown" : "text/plain") };
     documentPreview = null;
     statusPill.textContent = t.loaded(file.name);
   } catch (error) {
@@ -882,7 +883,8 @@ async function analyzeCurrentDocument() {
   const replyGerman = "Antwortentwurf nach Prüfung der verfügbaren Unterlagen im Fall erstellen.";
   latestHandoff = buildHandoff(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, lang);
 
-  renderResult(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, latestHandoff, lang);
+  if (!window.uaDeCloud?.configured)
+    renderResult(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, latestHandoff, lang);
   try {
     const response = await fetch("/api/documents/analyze", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -899,13 +901,18 @@ async function analyzeCurrentDocument() {
     extracted.request = Object.values(payload.analysis.requirement_sources || {})[0] || extracted.request;
     const verifiedItems = buildSendChecklist(extracted, risk, lang);
     const verifiedContext = buildReplyContext(extracted, risk, verifiedItems, lang);
-    const verifiedExplanation = tx[lang].plain(verifiedContext);
-    latestHandoff = buildHandoff(extracted, risk, verifiedItems, translation, verifiedExplanation, replyLocal, replyGerman, lang);
-    renderResult(extracted, risk, verifiedItems, translation, verifiedExplanation, replyLocal, replyGerman, latestHandoff, lang);
+    const verifiedExplanation = window.uaDeCloud?.configured
+      ? `${payload.analysis.summary || ""}\n\n${payload.analysis.legal_uncertainty || "Любой юридический вывод проверьте по оригиналу и официальному источнику."}`
+      : tx[lang].plain(verifiedContext);
+    const verifiedGermanDraft = window.uaDeCloud?.configured
+      ? payload.analysis.german_reply_draft || replyGerman : replyGerman;
+    latestHandoff = buildHandoff(extracted, risk, verifiedItems, translation, verifiedExplanation, replyLocal, verifiedGermanDraft, lang);
+    renderResult(extracted, risk, verifiedItems, translation, verifiedExplanation, replyLocal, verifiedGermanDraft, latestHandoff, lang);
     renderDocumentCaseFlow();
   } catch (error) {
     document.querySelector("#documentCaseFlow").hidden = true;
-    statusPill.textContent = `Дело не сохранено: ${error.message}`;
+    if (window.uaDeCloud?.configured) resultGrid.hidden = true;
+    statusPill.textContent = `Анализ или сохранение не удалось: ${error.message}`;
   }
 }
 

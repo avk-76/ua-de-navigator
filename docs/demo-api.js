@@ -211,7 +211,7 @@
       try { body = JSON.parse(options.body); } catch { body = {}; }
     }
     if (cloud?.configured && !cloud.user &&
-        /^\/api\/(dashboard|cases|deadlines|profile|checklist|documents\/attach)/.test(path)) {
+        /^\/api\/(dashboard|cases|deadlines|profile|checklist|documents\/(?:analyze|attach))/.test(path)) {
       return reply({ ok: false, error: "Войдите в личный кабинет." }, 401);
     }
     async function run() {
@@ -237,7 +237,7 @@
         return reply({ ok: false, error: "Letter reference does not match case" }, 409);
       if (!detail) {
         const id = `demo-case-${Date.now()}`;
-        detail = { id, user_id: "user-demo", title: `${analysis.authority_name} · ${analysis.document_type}`,
+        detail = { id, user_id: cloud?.configured ? cloud.user.id : "user-demo", title: `${analysis.authority_name} · ${analysis.document_type}`,
           authority_type: analysis.authority_type, authority_name: analysis.authority_name,
           reference_number: analysis.reference_number, status: "new", risk_level: analysis.risk_level,
           next_action: analysis.next_action, created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
@@ -249,10 +249,15 @@
       detail.risk_level = analysis.risk_level;
       detail.next_action = analysis.next_action;
       detail.ai_summary = analysis.summary;
-      const documentId = `demo-doc-${Date.now()}`;
+      const sourceType = body.mime_type === "application/pdf" ? "pdf" :
+        String(body.mime_type || "").startsWith("image/") ? "image" : "text";
+      const savedDocument = cloud?.configured ? await cloud.saveDocument({
+        caseId: detail.id, sourceType, redactedText: body.text, analysis,
+      }) : null;
+      const documentId = savedDocument?.id || `demo-doc-${Date.now()}`;
       detail.documents.unshift({ id: documentId, case_id: detail.id, file_name: body.file_name || "Вставленный текст",
         document_type: analysis.document_type, processing_status: "analyzed", analysis_json: analysis,
-        extracted_text: body.text, created_at: new Date().toISOString() });
+        extracted_text: cloud?.configured ? null : body.text, created_at: savedDocument?.created_at || new Date().toISOString() });
       detail.events.unshift({ id: `demo-event-${Date.now()}`, case_id: detail.id, event_type: "document_analyzed",
         summary: "Документ разобран", details: body.file_name || "Вставленный текст", document_id: documentId,
         occurred_at: new Date().toISOString() });
@@ -355,9 +360,19 @@
       const statement = attachments.length
         ? `in Antwort auf Ihr Schreiben übersende ich ausschließlich die folgenden vorhandenen Unterlagen:\n\nAnlagen: ${attachments.join(", ")}.`
         : "in Antwort auf Ihr Schreiben teile ich mit, dass ich derzeit keine Unterlagen beifügen kann.";
-      const german_text = `Betreff: Ihr Schreiben / Aktenzeichen ${detail.reference_number || "[eintragen]"}\n\nSehr geehrte Damen und Herren,\n\n${statement}\n\nBitte bestätigen Sie den Eingang.\n\nMit freundlichen Grüßen\n[Name eintragen]`;
+      let german_text = `Betreff: Ihr Schreiben / Aktenzeichen ${detail.reference_number || "[eintragen]"}\n\nSehr geehrte Damen und Herren,\n\n${statement}\n\nBitte bestätigen Sie den Eingang.\n\nMit freundlichen Grüßen\n[Name eintragen]`;
+      let local_text = "Демонстрационный черновик. Проверьте приложения и данные перед отправкой.";
+      if (cloud?.configured && detail.documents?.[0]) {
+        const saved = await cloud.getDocument(detail.documents[0].id);
+        if (saved.case_id !== detail.id) return reply({ ok: false, error: "Документ не принадлежит этому делу." }, 403);
+        const result = await cloud.invoke("reply", {
+          text: saved.redacted_text, available_documents: attachments, language: body.language || "ru",
+        });
+        german_text = result.reply.german_text;
+        local_text = result.reply.local_text;
+      }
       const draft = { id: `demo-draft-${Date.now()}`, german_text,
-        local_text: "Демонстрационный черновик. Проверьте приложения и данные перед отправкой.",
+        local_text,
         language: body.language || "ru", created_at: new Date().toISOString() };
       detail.drafts ||= [];
       detail.drafts.unshift(draft);

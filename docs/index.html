@@ -225,6 +225,8 @@
                 <span>Email для входа</span>
                 <input type="email" name="email" autocomplete="email" placeholder="name@example.com" required />
               </label>
+              <label><span>Пароль (минимум 12 символов)</span><input type="password" name="password" autocomplete="new-password" minlength="12" required /></label>
+              <label><span>Повторите пароль</span><input type="password" name="confirm_password" autocomplete="new-password" minlength="12" required /></label>
               <label>
                 <span>Цель обращения</span>
                 <select name="lead_goal" required>
@@ -238,7 +240,7 @@
                 <span>Федеральная земля <small>необязательно</small></span>
                 <input type="text" name="federal_state" maxlength="100" autocomplete="address-level1" placeholder="Например, Berlin" />
               </label>
-              <p class="lead-privacy-note">Адрес и телефон для регистрации не нужны. Для входа в тестовый период используйте avk/avk и ссылку, отправленную на вашу почту.</p>
+              <p class="lead-privacy-note">Адрес и телефон для регистрации не нужны. Доступ к кабинету откроется после подтверждения почты.</p>
               <label class="consent-check">
                 <input type="checkbox" name="account_consent" required />
                 <span>Согласен(на) на создание кабинета и хранение моих данных. Передача данных специалисту требует отдельного согласия.</span>
@@ -694,6 +696,8 @@
                   <span>Email для входа в кабинет</span>
                   <input type="email" name="email" autocomplete="email" placeholder="name@example.com" required />
                 </label>
+                <label><span>Пароль (минимум 12 символов)</span><input type="password" name="password" autocomplete="new-password" minlength="12" required /></label>
+                <label><span>Повторите пароль</span><input type="password" name="confirm_password" autocomplete="new-password" minlength="12" required /></label>
                 <label>
                   <span>Цель обращения</span>
                   <select name="lead_goal" required>
@@ -707,7 +711,7 @@
                   <span>Федеральная земля <small>необязательно</small></span>
                   <input type="text" name="federal_state" maxlength="100" autocomplete="address-level1" placeholder="Например, Berlin" />
                 </label>
-                <p class="lead-privacy-note">Адрес и телефон для регистрации не нужны. В тестовый период используйте avk/avk и подтвердите вход через почту.</p>
+                <p class="lead-privacy-note">Адрес и телефон для регистрации не нужны. Подтвердите почту по ссылке из письма.</p>
                 <label class="consent-check">
                   <input type="checkbox" name="account_consent" required />
                   <span>Согласен(на) на создание кабинета и обработку данных для сохранения маршрута. Данные не передаются специалистам без отдельного согласия.</span>
@@ -1347,20 +1351,19 @@
       <form id="accountLoginForm">
         <p class="section-label">ЛИЧНЫЙ КАБИНЕТ</p>
         <h2 id="accountLoginTitle">Войти в кабинет</h2>
-        <p>В тестовый период у всех логин и пароль avk/avk. Для доступа именно к вашему кабинету подтвердите вход по личной почте.</p>
-        <label for="accountLoginName">Логин</label>
-        <input id="accountLoginName" name="test_login" autocomplete="username" value="avk" required />
-        <label for="accountLoginPassword">Пароль</label>
-        <input id="accountLoginPassword" name="test_password" type="password" autocomplete="current-password" required />
+        <p>Войдите с адресом и паролем, указанными при регистрации. Почту нужно подтвердить по ссылке из письма.</p>
         <label for="accountLoginEmail">Ваша почта</label>
-        <input id="accountLoginEmail" name="email" type="email" autocomplete="email" required />
+        <input id="accountLoginEmail" name="email" type="email" autocomplete="username" required />
+        <label for="accountLoginPassword">Пароль</label>
+        <input id="accountLoginPassword" name="password" type="password" autocomplete="current-password" required />
         <p id="accountLoginStatus" class="lead-form-status" role="status"></p>
         <div class="privacy-review-actions">
           <button class="secondary-button" type="button" id="accountLoginCancel">Отмена</button>
-          <button class="primary-button" type="submit">Отправить ссылку для входа</button>
+          <button class="primary-button" type="submit">Войти</button>
         </div>
       </form>
       <p>Новый клиент? <button class="text-button" type="button" id="accountCreateButton">Создать кабинет</button></p>
+      <p><button class="text-button" type="button" id="accountResetButton">Забыли пароль?</button></p>
     </dialog>
 
     <script src="./cloud-config.js"></script>

@@ -8,3 +8,4 @@ backend/server.*.log
 .env.*
 node_modules/
 sites/dist/
+output/playwright/

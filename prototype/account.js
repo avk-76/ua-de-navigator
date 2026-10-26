@@ -3,7 +3,7 @@
   const form = document.querySelector("#accountLoginForm");
   const status = document.querySelector("#accountLoginStatus");
   const cloud = window.uaDeCloud;
-  const accountRoutes = new Set(["home", "cases", "case", "deadlines", "profile"]);
+  const accountRoutes = new Set(["home", "cases", "case", "deadlines", "profile", "document"]);
   window.uaDeSourceRefresh = cloud?.configured ? cloud.invoke("sources") : Promise.resolve({ sources: [] });
   window.uaDeSourceRefresh.catch(() => {});
 
@@ -30,18 +30,28 @@
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const data = new FormData(form);
-    if (data.get("test_login") !== "avk" || data.get("test_password") !== "avk") {
-      status.textContent = "Для тестового входа используйте avk/avk.";
-      return;
-    }
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
-    status.textContent = "Отправляем ссылку…";
+    status.textContent = "Проверяем вход…";
     try {
-      await cloud.requestEmail(String(data.get("email")).trim().toLowerCase());
-      status.textContent = "Ссылка отправлена. Откройте письмо на этом устройстве для входа.";
+      await cloud.signIn(String(data.get("email")).trim().toLowerCase(), String(data.get("password")));
+      dialog.close();
+      window.navigatePortal?.("home", { instant: true });
     } catch (error) { status.textContent = error.message; }
     finally { button.disabled = false; }
+  });
+  document.querySelector("#accountResetButton")?.addEventListener("click", async () => {
+    const email = String(form.elements.email.value || "").trim().toLowerCase();
+    if (!email || !form.elements.email.checkValidity()) {
+      status.textContent = "Сначала введите адрес электронной почты.";
+      form.elements.email.focus();
+      return;
+    }
+    status.textContent = "Отправляем ссылку восстановления…";
+    try {
+      await cloud.resetPassword(email);
+      status.textContent = "Если такой кабинет существует, письмо для восстановления отправлено.";
+    } catch (error) { status.textContent = error.message; }
   });
   const signOut = document.querySelector("#accountSignOut");
   const updateSignOut = () => { if (signOut) signOut.hidden = !cloud?.user; };

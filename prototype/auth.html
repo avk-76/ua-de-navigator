@@ -10,6 +10,13 @@
   <main class="app-shell" style="padding:clamp(20px,5vw,64px)">
     <h1>Подтверждение почты</h1>
     <p id="authCallbackStatus" role="status">Проверяем ссылку…</p>
+    <form id="passwordResetForm" class="lead-form" style="max-width:520px" hidden>
+      <label for="newPassword">Новый пароль (минимум 12 символов)</label>
+      <input id="newPassword" name="password" type="password" autocomplete="new-password" minlength="12" required />
+      <label for="confirmNewPassword">Повторите пароль</label>
+      <input id="confirmNewPassword" name="confirm_password" type="password" autocomplete="new-password" minlength="12" required />
+      <button type="submit">Сохранить новый пароль</button>
+    </form>
     <a href="./index.html">На главную</a>
   </main>
   <script src="./cloud-config.js"></script>

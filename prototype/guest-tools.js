@@ -125,7 +125,7 @@
     const summary = document.querySelector("#guestAnswerSummary");
     const caution = document.querySelector("#guestAnswerCaution");
     if (summary) summary.textContent = window.uaDeI18n?.t(answer.summary || "") || answer.summary || "";
-    if (caution) caution.textContent = window.uaDeI18n?.t(answer.caution || "") || answer.caution || "";
+    if (caution) caution.textContent = [answer.caution, answer.legal_uncertainty].filter(Boolean).join("\n\n");
     setList("#guestAnswerSteps", answer.steps);
     setList("#guestAnswerDocuments", answer.documents);
     setList("#guestClarifyingQuestions", answer.clarifying_questions);
@@ -194,6 +194,14 @@
       status.textContent = guestCopy("describeMore");
       return;
     }
+    if (window.uaDeCloud?.configured && !window.uaDeCloud.user) {
+      status.textContent = "Войдите в кабинет, чтобы отправить вопрос ИИ.";
+      window.uaDeAccount?.openLogin();
+      return;
+    }
+    const transferQuestion = window.uaDeCloud?.configured
+      ? await window.uaDeLocalDocument?.reviewForTransfer(question) : question;
+    if (!transferQuestion) return;
 
     const button = document.querySelector("#askGuestQuestion");
     const label = button.querySelector("span:first-child");
@@ -206,7 +214,7 @@
       if (window.uaDeCloud?.configured) {
         await window.uaDeSourceRefresh;
         payload = await window.uaDeCloud.invoke("question", {
-          question: window.uaDeLocalDocument?.redact(question) || question,
+          question: transferQuestion,
           language: document.querySelector("#languageSelect")?.value || "ru",
         });
       } else {
@@ -253,7 +261,8 @@
 
     try {
       if (!window.uaDeCloud?.configured) throw new Error("Регистрация пока не подключена к Supabase.");
-      await window.uaDeCloud.requestEmail(String(formData.get("email")).trim().toLowerCase(), {
+      if (formData.get("password") !== formData.get("confirm_password")) throw new Error("Пароли не совпадают.");
+      await window.uaDeCloud.signUp(String(formData.get("email")).trim().toLowerCase(), String(formData.get("password")), {
         display_name: String(formData.get("display_name")).trim(),
         preferred_language: guestLanguage(),
         federal_state: String(formData.get("federal_state") || "").trim(),
@@ -262,7 +271,7 @@
         account_consent: formData.get("account_consent") === "on",
         updates_consent: false,
       });
-      leadStatus.textContent = "Письмо отправлено. Перейдите по ссылке из письма, чтобы подтвердить почту и открыть кабинет.";
+      leadStatus.textContent = "Если адрес доступен для регистрации, письмо отправлено. Подтвердите почту по ссылке, затем войдите с паролем.";
     } catch (error) {
       leadStatus.textContent = error.message;
       submit.disabled = false;

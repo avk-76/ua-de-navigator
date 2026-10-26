@@ -331,7 +331,8 @@
     const data = new FormData(leadForm);
     try {
       if (!window.uaDeCloud?.configured) throw new Error("Регистрация пока не подключена к Supabase.");
-      await window.uaDeCloud.requestEmail(String(data.get("email")).trim().toLowerCase(), {
+      if (data.get("password") !== data.get("confirm_password")) throw new Error("Пароли не совпадают.");
+      await window.uaDeCloud.signUp(String(data.get("email")).trim().toLowerCase(), String(data.get("password")), {
         display_name: String(data.get("display_name")).trim(),
         preferred_language: document.querySelector("#languageSelect")?.value || "ru",
         federal_state: String(data.get("federal_state") || "").trim(),
@@ -340,7 +341,7 @@
         updates_consent: data.get("updates_consent") === "on",
         account_consent: data.get("account_consent") === "on",
       });
-      if (leadFormStatus) leadFormStatus.textContent = "Письмо отправлено. Перейдите по ссылке из письма, чтобы подтвердить почту и открыть кабинет.";
+      if (leadFormStatus) leadFormStatus.textContent = "Если адрес доступен для регистрации, письмо отправлено. Подтвердите почту по ссылке, затем войдите с паролем.";
     } catch (error) {
       if (leadFormStatus) leadFormStatus.textContent = error.message;
       if (submitButton) submitButton.disabled = false;
