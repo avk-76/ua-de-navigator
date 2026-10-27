@@ -12,6 +12,7 @@ assert.ok(!fixtures.profile.email);
 const banner = { innerHTML: "", className: "", setAttribute() {} };
 const lang = { value: "ru", addEventListener() {} };
 const document = {
+  body: { classList: { toggle() {} } },
   createElement: () => banner,
   querySelector: (selector) => selector === ".app-shell" ? { prepend() {} } : selector === "#languageSelect" ? lang : null,
 };

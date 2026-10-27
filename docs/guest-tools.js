@@ -143,7 +143,9 @@
         title.textContent = window.uaDeI18n?.t(source.title) || source.title;
         const meta = document.createElement("span");
         const authority = window.uaDeI18n?.t(source.authority) || source.authority;
-        meta.textContent = `${authority} · ${guestCopy("checked")} ${formatDate(source.last_checked_at)}`;
+        meta.textContent = source.last_checked_at
+          ? `${authority} · ${guestCopy("checked")} ${formatDate(source.last_checked_at)}`
+          : `${authority} · ${guestCopy("noCheckDate")}`;
         link.append(title, meta);
         sources.append(link);
       });
@@ -194,12 +196,14 @@
       status.textContent = guestCopy("describeMore");
       return;
     }
-    if (window.uaDeCloud?.configured && !window.uaDeCloud.user) {
-      status.textContent = "Войдите в кабинет, чтобы отправить вопрос ИИ.";
-      window.uaDeAccount?.openLogin();
+    const guest = !!window.uaDeCloud?.configured && !window.uaDeCloud.user;
+    if (guest && localStorage.getItem("ua-de-guest-question-used") === "1") {
+      status.textContent = "Первый бесплатный ответ уже использован. Создайте кабинет, чтобы продолжить.";
+      guestLeadCapture.hidden = false;
+      guestLeadCapture.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    const transferQuestion = window.uaDeCloud?.configured
+    const transferQuestion = window.uaDeCloud?.configured && !guest
       ? await window.uaDeLocalDocument?.reviewForTransfer(question) : question;
     if (!transferQuestion) return;
 
@@ -207,11 +211,14 @@
     const label = button.querySelector("span:first-child");
     button.disabled = true;
     label.textContent = guestCopy("analyzing");
-    status.textContent = guestCopy("matchingSources");
+    status.textContent = guest ? "Готовим первый ориентир на вашем устройстве…" : guestCopy("matchingSources");
 
     try {
       let payload;
-      if (window.uaDeCloud?.configured) {
+      if (guest) {
+        payload = { answer: window.uaDeGuestPreview(question, guestLanguage()) };
+        localStorage.setItem("ua-de-guest-question-used", "1");
+      } else if (window.uaDeCloud?.configured) {
         await window.uaDeSourceRefresh;
         payload = await window.uaDeCloud.invoke("question", {
           question: transferQuestion,
@@ -226,6 +233,10 @@
         if (!response.ok) throw new Error(payload.error || guestCopy("answerFailed"));
       }
       status.textContent = "";
+      const freshness = document.querySelector("#guestSourceFreshness");
+      if (freshness) freshness.textContent = guest
+        ? "Первичный ориентир · источники требуют проверки"
+        : "С официальными источниками";
       renderAnswer(payload.answer);
     } catch (error) {
       status.textContent = error.message;
@@ -242,6 +253,7 @@
   document.querySelectorAll("[data-question-register]").forEach((button) => {
     button.addEventListener("click", () => {
       guestLeadCapture.hidden = false;
+      guestLeadCapture.dataset.source = "question";
       guestLeadCapture.scrollIntoView({ behavior: "smooth", block: "center" });
       guestLeadForm?.querySelector('input[name="email"]')?.focus({ preventScroll: true });
     });
@@ -267,9 +279,9 @@
         preferred_language: guestLanguage(),
         federal_state: String(formData.get("federal_state") || "").trim(),
         lead_goal: String(formData.get("lead_goal")),
-        lead_source: "question",
+        lead_source: guestLeadCapture.dataset.source || "welcome",
         account_consent: formData.get("account_consent") === "on",
-        updates_consent: false,
+        updates_consent: formData.get("updates_consent") === "on",
       });
       leadStatus.textContent = "Если адрес доступен для регистрации, письмо отправлено. Подтвердите почту по ссылке, затем войдите с паролем.";
     } catch (error) {

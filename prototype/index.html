@@ -171,7 +171,7 @@
                 <p class="section-label">ПЕРВЫЙ ОТВЕТ ГОТОВ</p>
                 <h2>Ориентир для следующего шага</h2>
               </div>
-              <span class="source-freshness is-fresh">С официальными источниками</span>
+              <span class="source-freshness" id="guestSourceFreshness">Проверьте актуальные источники</span>
             </div>
             <div class="guest-answer-summary" id="guestAnswerSummary"></div>
             <div class="guest-answer-grid">
@@ -218,7 +218,7 @@
             <form id="guestLeadForm">
               <label>
                 <span>Как к вам обращаться</span>
-                <input type="text" name="display_name" autocomplete="name" maxlength="100" placeholder="Имя" required />
+                <input type="text" name="display_name" autocomplete="name" maxlength="100" placeholder="Имя (необязательно)" />
               </label>
               <label>
                 <span>Email для входа</span>
@@ -227,9 +227,9 @@
               <label><span>Пароль (минимум 12 символов)</span><input type="password" name="password" autocomplete="new-password" minlength="12" required /></label>
               <label><span>Повторите пароль</span><input type="password" name="confirm_password" autocomplete="new-password" minlength="12" required /></label>
               <label>
-                <span>Цель обращения</span>
-                <select name="lead_goal" required>
-                  <option value="">Выберите цель</option>
+                <span>Цель обращения <small>необязательно</small></span>
+                <select name="lead_goal">
+                  <option value="">Можно выбрать позже</option>
                   <option value="route">Маршрут переезда</option>
                   <option value="document">Разбор документа</option>
                   <option value="question">Вопрос ИИ-помощнику</option>
@@ -243,6 +243,10 @@
               <label class="consent-check">
                 <input type="checkbox" name="account_consent" required />
                 <span>Согласен(на) на создание кабинета и хранение моих данных. Передача данных специалисту требует отдельного согласия.</span>
+              </label>
+              <label class="consent-check optional-consent">
+                <input type="checkbox" name="updates_consent" />
+                <span>Можно присылать обновления сервиса. Это необязательно.</span>
               </label>
               <p class="lead-form-status" id="guestLeadStatus" role="status"></p>
               <button class="primary-button" type="submit">
@@ -689,7 +693,7 @@
                 <input type="hidden" name="requested_support" id="requestedSupport" value="" />
                 <label>
                   <span>Как к вам обращаться</span>
-                  <input type="text" name="display_name" autocomplete="name" maxlength="100" placeholder="Имя" required />
+                  <input type="text" name="display_name" autocomplete="name" maxlength="100" placeholder="Имя (необязательно)" />
                 </label>
                 <label>
                   <span>Email для входа в кабинет</span>
@@ -698,9 +702,9 @@
                 <label><span>Пароль (минимум 12 символов)</span><input type="password" name="password" autocomplete="new-password" minlength="12" required /></label>
                 <label><span>Повторите пароль</span><input type="password" name="confirm_password" autocomplete="new-password" minlength="12" required /></label>
                 <label>
-                  <span>Цель обращения</span>
-                  <select name="lead_goal" required>
-                    <option value="">Выберите цель</option>
+                  <span>Цель обращения <small>необязательно</small></span>
+                  <select name="lead_goal">
+                    <option value="">Можно выбрать позже</option>
                     <option value="route">Маршрут переезда</option>
                     <option value="document">Разбор документа</option>
                     <option value="question">Вопрос ИИ-помощнику</option>
@@ -1150,6 +1154,12 @@
         </section>
 
         <section class="result-grid" id="resultGrid" hidden>
+          <section class="portal-panel guest-document-next" id="guestDocumentNext" hidden>
+            <p class="section-label">ПЕРВЫЙ РАЗБОР ГОТОВ</p>
+            <h2>Сохраните результат в кабинете</h2>
+            <p>Разбор доступен до регистрации. Для сохранения дела и продолжения подтвердите почту.</p>
+            <button class="primary-button" type="button" data-document-register>Создать бесплатный кабинет →</button>
+          </section>
           <section class="portal-panel document-case-flow" id="documentCaseFlow" hidden>
             <p class="section-label">СОХРАНИТЬ ПРОДОЛЖЕНИЕ</p>
             <h2>К какому делу относится письмо?</h2>
@@ -1369,6 +1379,7 @@
     <script src="./cloud-client.js"></script>
     <script src="./account.js"></script>
     <script src="./portal.js?v=20261022-card"></script>
+    <script src="./guest-preview.js"></script>
     <script src="./guest-tools.js"></script>
     <script src="./onboarding.js"></script>
     <script src="./regional-support.js"></script>

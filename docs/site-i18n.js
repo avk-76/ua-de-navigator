@@ -1,5 +1,15 @@
 (() => {
   const rows = [
+    ["Имя (необязательно)", "Ім'я (необов'язково)", "Name (optional)", "Name (optional)"],
+    ["Можно выбрать позже", "Можна вибрати пізніше", "Später auswählen", "Choose later"],
+    ["Проверьте актуальные источники", "Перевірте актуальні джерела", "Aktuelle Quellen prüfen", "Check current sources"],
+    ["Первичный ориентир · источники требуют проверки", "Перший орієнтир · джерела потребують перевірки", "Erste Orientierung · Quellen prüfen", "Initial guidance · verify sources"],
+    ["Первый бесплатный ответ уже использован. Создайте кабинет, чтобы продолжить.", "Першу безкоштовну відповідь уже використано. Створіть кабінет, щоб продовжити.", "Die erste kostenlose Antwort wurde genutzt. Erstellen Sie ein Konto, um fortzufahren.", "Your first free answer has been used. Create an account to continue."],
+    ["Первый бесплатный разбор уже использован. Создайте кабинет, чтобы продолжить.", "Перший безкоштовний розбір уже використано. Створіть кабінет, щоб продовжити.", "Die erste kostenlose Analyse wurde genutzt. Erstellen Sie ein Konto, um fortzufahren.", "Your first free analysis has been used. Create an account to continue."],
+    ["Готовим первый ориентир на вашем устройстве…", "Готуємо перший орієнтир на вашому пристрої…", "Erste Orientierung wird auf Ihrem Gerät erstellt…", "Preparing initial guidance on your device…"],
+    ["ПЕРВЫЙ РАЗБОР ГОТОВ", "ПЕРШИЙ РОЗБІР ГОТОВИЙ", "ERSTE ANALYSE FERTIG", "FIRST ANALYSIS READY"],
+    ["Сохраните результат в кабинете", "Збережіть результат у кабінеті", "Ergebnis im Konto speichern", "Save the result in your account"],
+    ["Разбор доступен до регистрации. Для сохранения дела и продолжения подтвердите почту.", "Розбір доступний до реєстрації. Щоб зберегти справу й продовжити, підтвердьте пошту.", "Die Analyse ist vor der Registrierung verfügbar. Bestätigen Sie Ihre E-Mail, um den Fall zu speichern und fortzufahren.", "The analysis is available before registration. Confirm your email to save the case and continue."],
     ["Маршрут", "Маршрут", "Route", "Route"],
     ["Ваш ИИ-помощник", "Ваш ШІ-помічник", "Ihr KI-Assistent", "Your AI assistant"],
     ["Личный кабинет", "Особистий кабінет", "Mein Konto", "My account"],

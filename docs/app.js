@@ -858,16 +858,25 @@ analyzeButton.addEventListener("click", analyzeCurrentDocument);
 async function analyzeCurrentDocument() {
   const text = documentInput.value.trim();
   const lang = getLang();
+  const guest = !!window.uaDeCloud?.configured && !window.uaDeCloud.user;
   if (!text) {
     statusPill.textContent = ui[lang].emptyText;
     return;
   }
 
-  let transferText;
+  if (guest && localStorage.getItem("ua-de-guest-document-used") === "1") {
+    statusPill.textContent = "Первый бесплатный разбор уже использован. Создайте кабинет, чтобы продолжить.";
+    document.querySelector("#guestDocumentNext").hidden = false;
+    return;
+  }
+
+  let transferText = text;
   try {
-    if (!window.uaDeLocalDocument) throw new Error("Проверка личных данных недоступна");
-    transferText = await window.uaDeLocalDocument.reviewForTransfer(text);
-    if (!transferText) return;
+    if (!guest) {
+      if (!window.uaDeLocalDocument) throw new Error("Проверка личных данных недоступна");
+      transferText = await window.uaDeLocalDocument.reviewForTransfer(text);
+      if (!transferText) return;
+    }
   } catch (error) {
     statusPill.textContent = error.message;
     return;
@@ -883,7 +892,7 @@ async function analyzeCurrentDocument() {
   const replyGerman = "Antwortentwurf nach Prüfung der verfügbaren Unterlagen im Fall erstellen.";
   latestHandoff = buildHandoff(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, lang);
 
-  if (!window.uaDeCloud?.configured)
+  if (!window.uaDeCloud?.configured || guest)
     renderResult(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, latestHandoff, lang);
   try {
     const response = await fetch("/api/documents/analyze", {
@@ -892,6 +901,7 @@ async function analyzeCurrentDocument() {
     });
     const payload = await response.json();
     if (!response.ok || !payload.ok) throw new Error(payload.error || "Анализ недоступен");
+    if (guest) localStorage.setItem("ua-de-guest-document-used", "1");
     documentPreview = { analysis: payload.analysis, matches: payload.matches || [], text: transferText };
     // The case engine is the source for deadline and obligation candidates.
     // Keep the local translator, but do not let its illustrative rules
@@ -901,20 +911,26 @@ async function analyzeCurrentDocument() {
     extracted.request = Object.values(payload.analysis.requirement_sources || {})[0] || extracted.request;
     const verifiedItems = buildSendChecklist(extracted, risk, lang);
     const verifiedContext = buildReplyContext(extracted, risk, verifiedItems, lang);
-    const verifiedExplanation = window.uaDeCloud?.configured
+    const verifiedExplanation = window.uaDeCloud?.configured && !guest
       ? `${payload.analysis.summary || ""}\n\n${payload.analysis.legal_uncertainty || "Любой юридический вывод проверьте по оригиналу и официальному источнику."}`
       : tx[lang].plain(verifiedContext);
-    const verifiedGermanDraft = window.uaDeCloud?.configured
+    const verifiedGermanDraft = window.uaDeCloud?.configured && !guest
       ? payload.analysis.german_reply_draft || replyGerman : replyGerman;
     latestHandoff = buildHandoff(extracted, risk, verifiedItems, translation, verifiedExplanation, replyLocal, verifiedGermanDraft, lang);
     renderResult(extracted, risk, verifiedItems, translation, verifiedExplanation, replyLocal, verifiedGermanDraft, latestHandoff, lang);
-    renderDocumentCaseFlow();
+    document.querySelector("#guestDocumentNext").hidden = !guest;
+    if (guest) document.querySelector("#documentCaseFlow").hidden = true;
+    else renderDocumentCaseFlow();
   } catch (error) {
     document.querySelector("#documentCaseFlow").hidden = true;
-    if (window.uaDeCloud?.configured) resultGrid.hidden = true;
+    if (window.uaDeCloud?.configured && !guest) resultGrid.hidden = true;
     statusPill.textContent = `Анализ или сохранение не удалось: ${error.message}`;
   }
 }
+
+document.querySelector("[data-document-register]")?.addEventListener("click", () => {
+  window.uaDeAccount?.openRegistration("document");
+});
 
 function renderDocumentCaseFlow() {
   const panel = document.querySelector("#documentCaseFlow");

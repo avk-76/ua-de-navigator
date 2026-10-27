@@ -2,6 +2,7 @@
 (() => {
   const cloud = window.uaDeCloud;
   window.uaDeStaticDemo = !cloud?.configured;
+  document.body.classList.toggle("cloud-enabled", !!cloud?.configured);
   const nativeFetch = window.fetch.bind(window);
   const fixturePromise = nativeFetch("./demo-fixtures.json").then((response) => {
     if (!response.ok) throw new Error("Demo fixtures unavailable");
@@ -211,17 +212,17 @@
       try { body = JSON.parse(options.body); } catch { body = {}; }
     }
     if (cloud?.configured && !cloud.user &&
-        /^\/api\/(dashboard|cases|deadlines|profile|checklist|documents\/(?:analyze|attach))/.test(path)) {
+        /^\/api\/(dashboard|cases|deadlines|profile|checklist|documents\/attach)/.test(path)) {
       return reply({ ok: false, error: "Войдите в личный кабинет." }, 401);
     }
     async function run() {
     if (path === "/api/dashboard" && method === "GET") return reply({ ok: true, dashboard: dashboard(state) });
     if (path === "/api/cases" && method === "GET") return reply({ ok: true, cases: state.cases });
     if (path === "/api/documents/analyze" && method === "POST") {
-      const analysis = cloud?.configured
+      const analysis = cloud?.configured && cloud.user
         ? (await cloud.invoke("document", { text: body.text || "", language: document.querySelector("#languageSelect")?.value || "ru" })).analysis
         : analyze(body.text || "");
-      if (cloud?.configured) lastDocumentAnalysis = { text: body.text, analysis };
+      if (cloud?.configured && cloud.user) lastDocumentAnalysis = { text: body.text, analysis };
       return reply({ ok: true, analysis, matches: matchesFor(state, analysis) });
     }
     if (path === "/api/documents/attach" && method === "POST") {

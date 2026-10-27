@@ -3,7 +3,7 @@
   const form = document.querySelector("#accountLoginForm");
   const status = document.querySelector("#accountLoginStatus");
   const cloud = window.uaDeCloud;
-  const accountRoutes = new Set(["home", "cases", "case", "deadlines", "profile", "document"]);
+  const accountRoutes = new Set(["home", "cases", "case", "deadlines", "profile"]);
   window.uaDeSourceRefresh = cloud?.configured ? cloud.invoke("sources") : Promise.resolve({ sources: [] });
   window.uaDeSourceRefresh.catch(() => {});
 
@@ -14,18 +14,26 @@
     dialog.showModal();
   }
 
+  function openRegistration(source = "") {
+    if (dialog.open) dialog.close();
+    window.navigatePortal?.("welcome", { instant: true });
+    const section = document.querySelector("#guestLeadCapture");
+    section.hidden = false;
+    section.dataset.source = source || "welcome";
+    const goal = section.querySelector('select[name="lead_goal"]');
+    if (goal && ["route", "document", "question"].includes(source)) goal.value = source;
+    section.scrollIntoView({ behavior: "smooth", block: "center" });
+    section.querySelector('input[name="email"]')?.focus({ preventScroll: true });
+  }
+
   window.uaDeAccount = {
     shouldGuard(route) { return accountRoutes.has(route) && !!cloud?.configured && !cloud.user; },
-    openLogin,
+    openLogin, openRegistration,
   };
 
   document.querySelector("#accountLoginCancel")?.addEventListener("click", () => dialog.close());
   document.querySelector("#accountCreateButton")?.addEventListener("click", () => {
-    dialog.close();
-    window.navigatePortal?.("welcome");
-    const section = document.querySelector("#guestLeadCapture");
-    section.hidden = false;
-    section.scrollIntoView({ behavior: "smooth", block: "center" });
+    openRegistration();
   });
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();

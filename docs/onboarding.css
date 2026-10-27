@@ -1269,6 +1269,17 @@
   scroll-margin-top: 18px;
 }
 
+.guest-document-next {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+}
+
+.guest-document-next p,
+.guest-document-next h2 { margin: 0; }
+
+.guest-document-next .primary-button { justify-self: start; }
+
 .landing-capabilities,
 .landing-support,
 .landing-process {
