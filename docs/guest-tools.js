@@ -93,6 +93,12 @@
         de: "Konto konnte nicht erstellt werden",
         en: "Could not create the account",
       },
+      noSources: {
+        ru: "Актуальность официальных источников для этого первого ориентира не проверялась.",
+        uk: "Актуальність офіційних джерел для цього першого орієнтира не перевірялася.",
+        de: "Aktuelle amtliche Quellen wurden für diese erste Orientierung nicht geprüft.",
+        en: "Current official sources were not checked for this initial guidance.",
+      },
     };
     return copy[key]?.[guestLanguage()] || copy[key]?.ru || "";
   }
@@ -133,6 +139,11 @@
     const sources = document.querySelector("#guestAnswerSources");
     if (sources) {
       sources.replaceChildren();
+      if (!(answer.sources || []).length) {
+        const note = document.createElement("p");
+        note.textContent = guestCopy("noSources");
+        sources.append(note);
+      }
       (answer.sources || []).forEach((source) => {
         const link = document.createElement("a");
         link.className = "guest-source-link";

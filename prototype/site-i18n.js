@@ -1,5 +1,9 @@
 (() => {
   const rows = [
+    ["Задать вопрос", "Поставити запитання", "Frage stellen", "Ask a question"],
+    ["Получить первый ответ", "Отримати першу відповідь", "Erste Antwort erhalten", "Get the first answer"],
+    ["Первый ориентир и план действий до регистрации. В кабинете доступны ИИ и проверка источников.", "Перший орієнтир і план дій до реєстрації. У кабінеті доступні ШІ та перевірка джерел.", "Erste Orientierung und Handlungsplan vor der Registrierung. KI und Quellenprüfung gibt es im Konto.", "Initial guidance and an action plan before registration. AI and source checks are available in the account."],
+    ["Опишите ситуацию своими словами. Первый ориентир покажет возможный следующий шаг и вопросы для уточнения. Точный ИИ-ответ доступен в кабинете.", "Опишіть ситуацію своїми словами. Перший орієнтир покаже можливий наступний крок і запитання для уточнення. Точна відповідь ШІ доступна в кабінеті.", "Beschreiben Sie Ihre Situation. Die erste Orientierung zeigt einen möglichen nächsten Schritt und offene Fragen. Eine KI-Antwort gibt es im Konto.", "Describe your situation. Initial guidance shows a possible next step and questions to clarify. An AI answer is available in the account."],
     ["Имя (необязательно)", "Ім'я (необов'язково)", "Name (optional)", "Name (optional)"],
     ["Можно выбрать позже", "Можна вибрати пізніше", "Später auswählen", "Choose later"],
     ["Проверьте актуальные источники", "Перевірте актуальні джерела", "Aktuelle Quellen prüfen", "Check current sources"],
