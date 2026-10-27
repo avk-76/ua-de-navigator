@@ -66,7 +66,7 @@ def main() -> None:
     )
     html = re.sub(
         r'(<script src="\./portal\.js(?:\?[^\"]*)?"></script>)',
-        r'<script src="./demo-api.js?v=20261027-guest"></script>\n    \1',
+        r'<script src="./demo-api.js?v=20261027-fixes"></script>\n    \1',
         html,
         count=1,
     )

@@ -572,7 +572,9 @@
   grid-template-columns: 15px 92px minmax(0, 1fr);
   gap: 14px;
   padding: 0 0 28px;
+  min-width: 0;
 }
+.timeline-item > div { min-width: 0; overflow-wrap: anywhere; }
 
 .timeline-item::before {
   position: absolute;
@@ -1229,7 +1231,16 @@ summary:focus-visible {
 }
 .next-actions-panel { margin: 0 0 1.25rem; }
 .next-actions-panel .case-row { width: 100%; }
-.case-reply-flow { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border, #dbe4e2); }
+.case-reply-flow { margin-top: 1rem; padding: 1.5rem 24px 24px; border-top: 1px solid var(--border, #dbe4e2); min-width: 0; }
+.case-reply-flow > * { max-width: 100%; }
+.case-reply-flow h3 { margin-top: 0; }
+.reply-approval { display: flex; align-items: flex-start; gap: .6rem; margin: .75rem 0 1rem; }
+.reply-approval input { width: auto; margin: .2rem 0 0; }
+#nativeReply { display: block; width: 100%; box-sizing: border-box; min-height: 12rem; padding: 1rem; border: 1px solid var(--line); border-radius: .75rem; background: #fff; color: #18312c; font: inherit; }
+#replyApprovalLabel { display: flex; gap: .5rem; align-items: flex-start; margin: 1rem 0; }
+#replyApprovalLabel input { width: auto; margin-top: .25rem; }
+#nativeReply[hidden], #replyApprovalLabel[hidden] { display: none; }
+@media (max-width: 640px) { .case-reply-flow { padding-inline: 18px; } .timeline-list { padding-inline: 18px; } }
 .case-reply-flow textarea, .case-reply-flow select, #caseDeadlineConfirmation input {
   display: block; width: 100%; box-sizing: border-box; margin: .5rem 0 1rem;
   border: 1px solid #c7d5d1; border-radius: .75rem; padding: .8rem;

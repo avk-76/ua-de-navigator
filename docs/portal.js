@@ -455,17 +455,36 @@ function renderReplyFlow(caseData) {
   const choices = document.querySelector("#replyDocumentChoices");
   const draft = document.querySelector("#caseDraft");
   if (!choices || !draft) return;
+  const lang = portalLanguage();
+  const words = {
+    ru: { noReply: "Это информационное письмо. Ответ отправлять не нужно.", review: "Проверьте и при желании измените ответ на своём языке.", approve: "Я проверил(а) и согласен(-на) перевести эту версию", translate: "Перевести на немецкий", german: "Немецкий текст для отправки" },
+    uk: { noReply: "Це інформаційний лист. Відповідь надсилати не потрібно.", review: "Перевірте й за бажанням змініть відповідь своєю мовою.", approve: "Я перевірив(ла) і погоджуюся перекласти цю версію", translate: "Перекласти німецькою", german: "Німецький текст для надсилання" },
+    de: { noReply: "Dieses Informationsschreiben erfordert keine Antwort.", review: "Prüfen und bearbeiten Sie Ihre Antwort.", approve: "Ich habe diese Fassung geprüft und bestätige die Übersetzung", translate: "Ins Deutsche übersetzen", german: "Deutscher Text zum Versenden" },
+    en: { noReply: "This information letter needs no reply.", review: "Review and edit your response in your language.", approve: "I reviewed and approve this version for translation", translate: "Translate to German", german: "German text to send" },
+  }[lang];
+  const lastAnalysis = caseData.documents?.[0]?.analysis_json || {};
+  const informationOnly = lastAnalysis.requires_reply === false || /freischaltcode|aktivierungscode/i.test(`${lastAnalysis.summary || ""} ${lastAnalysis.document_type || ""}`);
+  document.querySelector("#prepareCaseReply").hidden = informationOnly;
+  document.querySelector("#replyExplanation").closest("label").hidden = informationOnly;
+  if (informationOnly) {
+    choices.innerHTML = `<p>${escapePortalHtml(words.noReply)}</p>`;
+    draft.innerHTML = "";
+    return;
+  }
   choices.innerHTML = (caseData.checklist || []).map((item) => `
     <label class="reply-choice"><input type="checkbox" value="${escapePortalHtml(item.title)}" ${item.completed ? "checked" : ""} /> ${escapePortalHtml(portalText(item.title))}</label>
-  `).join("") || "<p>Проверьте письмо и укажите приложения вручную в черновике.</p>";
+  `).join("") || `<p>${escapePortalHtml({ ru: "Проверьте письмо и укажите приложения вручную в черновике.", uk: "Перевірте лист і вкажіть додатки вручну в чернетці.", de: "Prüfen Sie den Brief und ergänzen Sie Anlagen im Entwurf.", en: "Check the letter and add attachments manually in the draft." }[lang])}</p>`;
   const latest = (caseData.drafts || [])[0];
   const sentHistory = (caseData.drafts || []).filter((item) => item.sent_at);
   draft.innerHTML = latest ? `
-    <h4>Черновик ответа · Deutsch</h4>
-    <textarea id="editableGermanDraft" rows="11" ${latest.sent_at ? "readonly" : ""}>${escapePortalHtml(latest.german_text)}</textarea>
-    <details><summary>Перевод смысла</summary><p>${escapePortalHtml(latest.local_text)}</p></details>
-    <button class="secondary-button" type="button" data-copy-draft>Скопировать текст</button>
-    ${latest.sent_at ? "" : `
+    <h4>${escapePortalHtml(words.review)}</h4>
+    <textarea id="editableLocalDraft" rows="10" ${latest.sent_at ? "readonly" : ""}>${escapePortalHtml(latest.local_text || "")}</textarea>
+    ${latest.sent_at ? "" : `<label class="reply-approval"><input id="approveCaseReply" type="checkbox" /> ${escapePortalHtml(words.approve)}</label>
+      <button class="primary-button" type="button" data-translate-draft="${escapePortalHtml(latest.id)}">${escapePortalHtml(words.translate)}</button>`}
+    ${latest.approved_local_at && latest.german_text ? `<h4>${escapePortalHtml(words.german)}</h4>
+      <textarea id="editableGermanDraft" rows="11" ${latest.sent_at ? "readonly" : ""}>${escapePortalHtml(latest.german_text)}</textarea>
+      <button class="secondary-button" type="button" data-copy-draft>Скопировать текст</button>` : ""}
+    ${latest.sent_at || !latest.approved_local_at || !latest.german_text ? "" : `
       <div class="sent-controls"><label>Дата отправки <input type="date" id="draftSentDate" /></label>
       <label>Способ <select id="draftSentVia"><option value="email">Email</option><option value="portal">Портал ведомства</option><option value="post">Почта</option><option value="in_person">Лично</option><option value="fax">Fax</option><option value="other">Другое</option></select></label>
       <label>Номер или место подтверждения <input id="draftSentProof" type="text" maxlength="500" placeholder="Необязательно: квитанция, PDF, номер" /></label>
@@ -506,6 +525,17 @@ document.addEventListener("click", async (event) => {
   }
   if (event.target.closest("[data-copy-draft]")) {
     await navigator.clipboard.writeText(document.querySelector("#editableGermanDraft")?.value || "");
+  }
+  const translateButton = event.target.closest("[data-translate-draft]");
+  if (translateButton) {
+    if (!document.querySelector("#approveCaseReply")?.checked) return showPortalError("Сначала проверьте и подтвердите текст на своём языке.");
+    try {
+      await apiRequest(`/api/cases/${encodeURIComponent(portalState.selectedCaseId)}/drafts/${encodeURIComponent(translateButton.dataset.translateDraft)}/translate`, {
+        method: "POST", body: JSON.stringify({ local_text: document.querySelector("#editableLocalDraft")?.value || "", approved: true }),
+      });
+      await loadCase(portalState.selectedCaseId);
+    } catch (error) { showPortalError(error.message); }
+    return;
   }
   const sentButton = event.target.closest("[data-mark-sent]");
   if (sentButton) {

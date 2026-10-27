@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#080b0c" />
     <title>UA-DE Navigator — следующий шаг без бюрократического шума</title>
     <link rel="stylesheet" href="./styles.css" />
-    <link rel="stylesheet" href="./portal.css" />
+    <link rel="stylesheet" href="./portal.css?v=20261027-fixes" />
     <link rel="stylesheet" href="./onboarding.css?v=20261027-guest" />
     <link rel="stylesheet" href="./demo.css?v=20261027-guest" />
   </head>
@@ -1285,7 +1285,11 @@
               </span>
             </summary>
             <div class="section-body">
-              <pre id="nativeReply"></pre>
+              <p id="nativeReplyHintText"></p>
+              <textarea id="nativeReply" rows="9" aria-label="Ответ на вашем языке"></textarea>
+              <label id="replyApprovalLabel"><input id="replyApproval" type="checkbox" /> Я проверил(а) текст и согласен(-на) перевести именно эту версию на немецкий</label>
+              <button class="primary-button" id="translateApprovedReply" type="button">Перевести подтверждённый ответ →</button>
+              <p id="replyApprovalStatus" role="status"></p>
             </div>
           </details>
 
@@ -1379,14 +1383,14 @@
     <script src="./cloud-config.js"></script>
     <script src="./cloud-client.js"></script>
     <script src="./account.js?v=20261027-guest"></script>
-    <script src="./demo-api.js?v=20261027-guest"></script>
-    <script src="./portal.js?v=20261027-guest"></script>
+    <script src="./demo-api.js?v=20261027-fixes"></script>
+    <script src="./portal.js?v=20261027-fixes"></script>
     <script src="./guest-preview.js?v=20261027-guest"></script>
     <script src="./guest-tools.js?v=20261027-guest2"></script>
     <script src="./onboarding.js"></script>
     <script src="./regional-support.js"></script>
-    <script src="./local-document.js"></script>
-    <script src="./app.js?v=20261027-guest"></script>
+    <script src="./local-document.js?v=20261027-fixes"></script>
+    <script src="./app.js?v=20261027-fixes"></script>
     <script src="./site-i18n.js?v=20261027-guest2"></script>
   </body>
 </html>

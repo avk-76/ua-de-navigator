@@ -872,24 +872,22 @@ async function analyzeCurrentDocument() {
 
   let transferText = text;
   try {
-    if (!guest) {
-      if (!window.uaDeLocalDocument) throw new Error("Проверка личных данных недоступна");
-      transferText = await window.uaDeLocalDocument.reviewForTransfer(text);
-      if (!transferText) return;
-    }
+    if (!window.uaDeLocalDocument) throw new Error("Проверка личных данных недоступна");
+    transferText = await window.uaDeLocalDocument.reviewForTransfer(text);
+    if (!transferText) return;
   } catch (error) {
     statusPill.textContent = error.message;
     return;
   }
 
-  const extracted = extractFields(text, lang);
-  const risk = decideRisk(text, extracted, lang);
+  const extracted = extractFields(transferText, lang);
+  const risk = decideRisk(transferText, extracted, lang);
   const sendItems = buildSendChecklist(extracted, risk, lang);
-  const translation = translateLetter(text, lang);
+  const translation = lang === "de" ? transferText : translateLetter(transferText, lang);
   const context = buildReplyContext(extracted, risk, sendItems, lang);
   const explanation = tx[lang].plain(context);
   const replyLocal = "Черновик появится после выбора дела и проверки доступных документов.";
-  const replyGerman = "Antwortentwurf nach Prüfung der verfügbaren Unterlagen im Fall erstellen.";
+  const replyGerman = "";
   latestHandoff = buildHandoff(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, lang);
 
   if (!window.uaDeCloud?.configured || guest)
@@ -909,15 +907,14 @@ async function analyzeCurrentDocument() {
     extracted.deadline = payload.analysis.deadline?.extracted_due_at || tx[lang].notFound;
     extracted.explicitDocuments = payload.analysis.required_documents || [];
     extracted.request = Object.values(payload.analysis.requirement_sources || {})[0] || extracted.request;
+    if (payload.analysis.risk_level === "green") Object.assign(risk, decideRisk("", { ...extracted, deadline: tx[lang].notFound }, lang));
     const verifiedItems = buildSendChecklist(extracted, risk, lang);
     const verifiedContext = buildReplyContext(extracted, risk, verifiedItems, lang);
-    const verifiedExplanation = window.uaDeCloud?.configured && !guest
-      ? `${payload.analysis.summary || ""}\n\n${payload.analysis.legal_uncertainty || "Любой юридический вывод проверьте по оригиналу и официальному источнику."}`
-      : tx[lang].plain(verifiedContext);
-    const verifiedGermanDraft = window.uaDeCloud?.configured && !guest
-      ? payload.analysis.german_reply_draft || replyGerman : replyGerman;
-    latestHandoff = buildHandoff(extracted, risk, verifiedItems, translation, verifiedExplanation, replyLocal, verifiedGermanDraft, lang);
-    renderResult(extracted, risk, verifiedItems, translation, verifiedExplanation, replyLocal, verifiedGermanDraft, latestHandoff, lang);
+    const verifiedExplanation = payload.analysis.summary || tx[lang].plain(verifiedContext);
+    const verifiedTranslation = payload.analysis.full_translation || (lang === "de" ? transferText : "");
+    const approvedNativeDraft = payload.analysis.requires_reply ? payload.analysis.native_reply_draft || "" : "";
+    latestHandoff = buildHandoff(extracted, risk, verifiedItems, verifiedTranslation, verifiedExplanation, approvedNativeDraft, "", lang, payload.analysis);
+    renderResult(extracted, risk, verifiedItems, verifiedTranslation, verifiedExplanation, approvedNativeDraft, "", latestHandoff, lang, payload.analysis);
     document.querySelector("#guestDocumentNext").hidden = !guest;
     if (guest) document.querySelector("#documentCaseFlow").hidden = true;
     else renderDocumentCaseFlow();
@@ -990,6 +987,29 @@ downloadButton.addEventListener("click", () => {
   link.download = "ua-de-handoff-package.md";
   link.click();
   URL.revokeObjectURL(url);
+});
+
+document.querySelector("#nativeReply")?.addEventListener("input", () => {
+  document.querySelector("#replyApproval").checked = false;
+  germanDraft.textContent = "";
+});
+
+document.querySelector("#translateApprovedReply")?.addEventListener("click", async () => {
+  const status = document.querySelector("#replyApprovalStatus");
+  const approvedText = document.querySelector("#nativeReply").value.trim();
+  const lang = getLang();
+  if (!approvedText || !document.querySelector("#replyApproval").checked) {
+    status.textContent = { ru: "Сначала проверьте текст и отметьте согласие.", uk: "Спершу перевірте текст і підтвердьте згоду.", de: "Prüfen und bestätigen Sie zuerst den Text.", en: "Review and approve the text first." }[lang];
+    return;
+  }
+  status.textContent = { ru: "Переводим подтверждённую версию…", uk: "Перекладаємо підтверджену версію…", de: "Bestätigten Text übersetzen…", en: "Translating approved text…" }[lang];
+  try {
+    const response = await fetch("/api/reply/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: approvedText, language: lang, approved: true }) });
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) throw new Error(payload.error || "Translation unavailable");
+    germanDraft.textContent = payload.reply.german_text;
+    status.textContent = { ru: "Немецкий перевод готов. Проверьте его перед отправкой.", uk: "Німецький переклад готовий. Перевірте його перед надсиланням.", de: "Die deutsche Fassung ist fertig. Prüfen Sie sie vor dem Versand.", en: "The German translation is ready. Review it before sending." }[lang];
+  } catch (error) { status.textContent = error.message; }
 });
 
 function getLang() {
@@ -1140,7 +1160,7 @@ function buildSendChecklist(extracted, risk, lang) {
     source: sourceHint(doc, lang),
   }));
   if (risk.level === "red") items.push({ title: tx[lang].specialistTitle, original: "", detail: tx[lang].specialistDetail, source: "" });
-  items.push({ title: tx[lang].beforeSendTitle, original: "", detail: tx[lang].beforeSendDetail, source: "" });
+  if (docs.length) items.push({ title: tx[lang].beforeSendTitle, original: "", detail: tx[lang].beforeSendDetail, source: "" });
   return items;
 }
 
@@ -1285,73 +1305,63 @@ function sourceHint(name, lang) {
   return s.letter;
 }
 
-function buildHandoff(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, lang) {
-  const u = ui[lang];
-  return `# Handoff Package
-
-## ${u.handoffValueTitle}
-
-${u.handoffValueText}
-
-## ${u.handoffSummaryTitle}
-
-- ${u.handoffAuthority}: ${extracted.authority}
-- ${u.handoffDeadline}: ${extracted.deadline}
-- ${u.handoffRisk}: ${risk.title}
-
-## ${u.handoffWhatToSend}
-
-${sendItems.map((item) => `- ${item.title}${item.original ? ` (${item.original})` : ""}: ${item.detail}`).join("\n")}
-
-## ${u.handoffFullTranslation}
-
-${translation}
-
-## ${u.handoffPlainExplanation}
-
-${explanation}
-
-## ${u.handoffUserReply}
-
-${replyLocal}
-
-## ${u.handoffGermanReply}
-
-${replyGerman}
-`;
+function buildHandoff(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, lang, analysis) {
+  const copy = {
+    ru: { none: "Пока помощь специалиста не требуется.", title: "Вопрос специалисту", issue: "Что нужно уточнить", due: "Срок ответа", documents: "Запрошенные документы" },
+    uk: { none: "Поки що допомога фахівця не потрібна.", title: "Питання фахівцю", issue: "Що треба уточнити", due: "Строк відповіді", documents: "Запитані документи" },
+    de: { none: "Derzeit ist keine fachliche Hilfe erforderlich.", title: "Frage an die Fachperson", issue: "Zu klären", due: "Antwortfrist", documents: "Angeforderte Unterlagen" },
+    en: { none: "No specialist help is needed at this stage.", title: "Question for a specialist", issue: "Issue to clarify", due: "Reply deadline", documents: "Requested documents" },
+  }[lang];
+  if (!analysis?.needs_specialist || !analysis.specialist_question?.trim()) return copy.none;
+  const lines = [`# ${copy.title}`, `- ${copy.issue}: ${analysis.specialist_question.trim()}`];
+  if (analysis.deadline?.extracted_due_at) lines.push(`- ${copy.due}: ${analysis.deadline.extracted_due_at}`);
+  if (analysis.required_documents?.length) lines.push(`- ${copy.documents}: ${analysis.required_documents.slice(0, 3).join(", ")}`);
+  return lines.join("\n");
 }
 
-function renderResult(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, handoff, lang) {
+function renderResult(extracted, risk, sendItems, translation, explanation, replyLocal, replyGerman, handoff, lang, analysis) {
   const t = tx[lang];
   const foundIds = Object.entries(extracted.identifiers).filter(([, value]) => value !== "-");
   resultGrid.hidden = false;
   riskCard.className = `risk-card ${risk.level}`;
   riskTitle.textContent = risk.title;
   riskSummary.textContent = risk.summary;
-  summaryAction.textContent = requestMeaning(extracted.request, lang);
+  summaryAction.textContent = analysis?.next_action || requestMeaning(extracted.request, lang);
   summaryDeadline.textContent = extracted.deadline;
   summaryAuthority.textContent = extracted.authority;
   summaryReference.textContent = foundIds.length
     ? foundIds.map(([label, value]) => `${label}: ${value}`).join(" · ")
     : t.notFound;
-  fullTranslation.textContent = translation;
+  fullTranslation.textContent = translation || { ru: "Полный перевод сейчас недоступен. Повторите разбор позже.", uk: "Повний переклад зараз недоступний. Повторіть аналіз пізніше.", de: "Die vollständige Übersetzung ist derzeit nicht verfügbar.", en: "The full translation is unavailable. Please try again later." }[lang];
   plainExplanation.textContent = explanation;
-  nativeReply.textContent = replyLocal;
-  germanDraft.textContent = replyGerman;
+  nativeReply.value = replyLocal;
+  const needsReply = analysis?.requires_reply === true;
+  const copy = { ru: ["Это письмо не требует ответа.", "Проверьте и подтвердите текст перед переводом.", "Перевести подтверждённый ответ →"], uk: ["Цей лист не потребує відповіді.", "Перевірте й підтвердьте текст перед перекладом.", "Перекласти підтверджену відповідь →"], de: ["Für dieses Schreiben ist keine Antwort erforderlich.", "Prüfen und bestätigen Sie den Text vor der Übersetzung.", "Bestätigte Antwort übersetzen →"], en: ["This letter does not require a reply.", "Review and approve the text before translation.", "Translate approved reply →"] }[lang];
+  document.querySelector("#nativeReplyHintText").textContent = needsReply ? copy[1] : copy[0];
+  document.querySelector("#nativeReply").hidden = !needsReply;
+  const approvalLabel = document.querySelector("#replyApprovalLabel");
+  approvalLabel.hidden = !needsReply;
+  approvalLabel.lastChild.textContent = { ru: " Я проверил(а) текст и согласен(-на) перевести именно эту версию на немецкий", uk: " Я перевірив(ла) текст і погоджуюся перекласти саме цю версію німецькою", de: " Ich habe diese Fassung geprüft und bestätige die Übersetzung", en: " I have reviewed this text and approve translating this exact version to German" }[lang];
+  document.querySelector("#translateApprovedReply").hidden = !needsReply;
+  document.querySelector("#translateApprovedReply").textContent = copy[2];
+  document.querySelector("#replyApproval").checked = false;
+  document.querySelector("#replyApprovalStatus").textContent = "";
+  germanDraft.textContent = needsReply ? { ru: "Немецкий перевод появится после вашего подтверждения.", uk: "Німецький переклад з’явиться після вашого підтвердження.", de: "Die deutsche Fassung erscheint nach Ihrer Bestätigung.", en: "The German version will appear after you approve the text." }[lang] : "";
+  germanDraft.closest("details").hidden = !needsReply;
   handoffPackage.textContent = handoff;
+  downloadButton.hidden = !analysis?.needs_specialist;
 
   const fields = [
     [t.fieldLabels.authority, extracted.authority],
     [t.fieldLabels.deadline, extracted.deadline],
     [t.fieldLabels.dates, extracted.dates.join(", ") || t.notFound],
     [t.fieldLabels.amounts, extracted.amounts.join(", ") || t.notFound],
-    [t.fieldLabels.request, extracted.request],
-    ...Object.entries(extracted.identifiers),
+    [t.fieldLabels.request, analysis?.next_action || requestMeaning(extracted.request, lang)],
   ];
   fieldGrid.innerHTML = fields.map(([label, value]) => `<div class="field"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`).join("");
   sendChecklist.innerHTML = sendItems
     .map((item) => `<div class="send-item"><strong>${escapeHtml(item.title)}</strong>${item.original ? `<em>${escapeHtml(`${t.original}: ${item.original}`)}</em>` : ""}<span>${escapeHtml(`${item.detail} ${item.source || ""}`)}</span></div>`)
-    .join("");
+    .join("") || `<p>${escapeHtml({ ru: "К письму не запрошены дополнительные документы.", uk: "У листі не запитано додаткових документів.", de: "Im Schreiben werden keine zusätzlichen Unterlagen angefordert.", en: "The letter does not request additional documents." }[lang])}</p>`;
   statusPill.textContent = ui[lang].analyzeButton;
   resultGrid.scrollIntoView({ behavior: "smooth", block: "start" });
 }

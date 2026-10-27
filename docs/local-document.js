@@ -95,6 +95,10 @@
     /\b\d{5}\s+[A-ZÄÖÜ][\p{L}ßäöü-]+(?:\s+[A-ZÄÖÜ][\p{L}ßäöü-]+)?\b/gu,
     /\b[\p{L}][\p{L}.-]*(?:straße|strasse|str\.|weg|allee|platz|gasse|ring|damm|chaussee)\s+\d+[a-z]?\b/giu,
     /\b(?:Herrn?|Frau|Mr\.?|Mrs\.?)\s+[\p{Lu}][\p{L}'-]+(?:\s+[\p{Lu}][\p{L}'-]+){0,2}/gu,
+    /(?:^|\n)(?:Herrn?|Frau)\s*\n\s*[\p{Lu}][\p{L}'-]+\s+[\p{Lu}][\p{L}'-]+/gmu,
+    /(?:^|\n)[\p{Lu}][\p{L}'-]+\s+[\p{Lu}][\p{L}'-]+\s+KA\s?\d{5,}\b/gmu,
+    /\b(?:KA\s?\d{5,}|[A-Z]{1,3}\d{7,})\b/gi,
+    /\b(?:Versichertennummer|Versicherungsnummer|Mitgliedsnummer|Freischaltcode|Aktivierungscode)\s*[:#-]?\s*[A-Z0-9-]{5,}\b/gi,
     /^(?:Name|Vorname|Nachname|Familienname|Geburtsdatum|Anschrift|Adresse|Telefon|E-Mail|Kundennummer|BG-Nummer|Aktenzeichen|Steuernummer)\s*:\s*.+$/gim,
   ];
 

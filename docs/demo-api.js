@@ -162,8 +162,15 @@
       document_names: detail.documents.map((item) => item.file_name).join(" "), updated_at: new Date().toISOString() });
   };
 
-  const analyze = (text) => {
+  const analyze = (text, language = document.querySelector("#languageSelect")?.value || "ru") => {
     const lower = text.toLowerCase();
+    const activationLetter = /freischaltcode|aktivierungscode/i.test(text) && /tk-app|meine tk/i.test(text);
+    const local = {
+      ru: { code: "Введите код активации в приложении или на сайте TK. Это не срок ответа на письмо.", check: "Проверьте письмо", summary: "Это информационное письмо от медицинской кассы. Ответ не требуется.", dated: "Возможный срок ответа требует подтверждения.", undated: "Явный срок ответа не найден." },
+      uk: { code: "Введіть код активації в застосунку або на сайті TK. Це не строк відповіді на лист.", check: "Перевірте лист", summary: "Це інформаційний лист від медичної каси. Відповідь не потрібна.", dated: "Можливий строк відповіді треба підтвердити.", undated: "Чіткого строку відповіді не знайдено." },
+      de: { code: "Geben Sie den Aktivierungscode in der TK-App oder auf der TK-Website ein. Dies ist keine Antwortfrist.", check: "Schreiben prüfen", summary: "Dies ist ein Informationsschreiben der Krankenkasse. Eine Antwort ist nicht erforderlich.", dated: "Eine mögliche Antwortfrist muss geprüft werden.", undated: "Keine ausdrückliche Antwortfrist gefunden." },
+      en: { code: "Enter the activation code in the TK app or website. This is not a deadline to reply.", check: "Review the letter", summary: "This is an information letter from the health insurer. No reply is required.", dated: "A possible reply deadline needs confirmation.", undated: "No explicit reply deadline was found." },
+    }[language] || null;
     const authority_type = lower.includes("jobcenter") ? "jobcenter" : lower.includes("finanzamt") ? "finanzamt" : lower.includes("krankenkasse") ? "krankenkasse" : "other";
     const authority_name = { jobcenter: "Jobcenter", finanzamt: "Finanzamt", krankenkasse: "Krankenkasse", other: "Ведомство не определено" }[authority_type];
     const ref = text.match(/(?:Aktenzeichen|BG-Nummer|Kundennummer)\s*:\s*([^\n\r]+)/i)?.[1]?.trim() || null;
@@ -172,7 +179,7 @@
     const datePattern = /(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})/g;
     const line = lines.find((item) => cue.test(item) && [...item.matchAll(datePattern)].some((match) => match.index >= cue.exec(item).index));
     const dateMatch = line && [...line.matchAll(datePattern)].find((match) => match.index >= cue.exec(line).index);
-    const due = dateMatch ? `${dateMatch[3]}-${dateMatch[2].padStart(2, "0")}-${dateMatch[1].padStart(2, "0")}` : null;
+    const due = !activationLetter && dateMatch ? `${dateMatch[3]}-${dateMatch[2].padStart(2, "0")}-${dateMatch[1].padStart(2, "0")}` : null;
     const docs = [["Kontoauszüge", /kontoausz[üu]ge|kontoauszug/i], ["Mietvertrag", /mietvertrag/i],
       ["Meldebescheinigung", /meldebescheinigung/i], ["Einkommensnachweise", /einkommensnachweis/i],
       ["Immatrikulationsbescheinigung", /immatrikulationsbescheinigung/i]];
@@ -192,9 +199,12 @@
       sender: lines[0] || authority_name, letter_date, requirement_sources,
       document_type: /mitwirkung/i.test(text) ? "Aufforderung zur Mitwirkung" : "Schreiben / Bescheid",
       category: authority_type, risk_level: due ? "red" : required_documents.length ? "yellow" : "green",
-      required_documents, next_action: required_documents.length ? "Требуемые документы проверить и подготовить" : "Проверить письмо",
+      required_documents: activationLetter ? [] : required_documents,
+      requires_reply: !activationLetter && required_documents.length > 0,
+      native_reply_draft: "", full_translation: "", needs_specialist: false, specialist_question: "",
+      next_action: activationLetter ? local.code : local.check,
       deadline: { extracted_due_at: due, source_text: line || null, confidence: due ? 0.7 : 0 },
-      summary: `Письмо от ${authority_name}. ${due ? "Возможный срок требует подтверждения." : "Явный срок не найден."}`,
+      summary: activationLetter ? local.summary : `${authority_name}. ${due ? local.dated : local.undated}`,
       limitations: "Это локальный демонстрационный разбор, не юридическое заключение.",
     };
   };
@@ -224,6 +234,12 @@
         : analyze(body.text || "");
       if (cloud?.configured && cloud.user) lastDocumentAnalysis = { text: body.text, analysis };
       return reply({ ok: true, analysis, matches: matchesFor(state, analysis) });
+    }
+    if (path === "/api/reply/translate" && method === "POST") {
+      if (body.approved !== true || !String(body.text || "").trim()) return reply({ ok: false, error: "Подтвердите текст ответа перед переводом." }, 400);
+      if (!cloud?.configured || !cloud.user) return reply({ ok: false, error: "Перевод доступен после входа в кабинет." }, 401);
+      const result = await cloud.invoke("translate_reply", { text: body.text, language: body.language || "ru", approved: true });
+      return reply({ ok: true, reply: result.reply });
     }
     if (path === "/api/documents/attach" && method === "POST") {
       const analysis = cloud?.configured
@@ -339,6 +355,8 @@
       const detail = state.case_details[draftSent[1]];
       const draft = detail?.drafts?.find((item) => item.id === draftSent[2]);
       if (!draft) return reply({ ok: false, error: "Draft not found" }, 404);
+      if (!draft.approved_local_at || !draft.german_text?.trim())
+        return reply({ ok: false, error: "Сначала подтвердите ответ на своём языке и переведите его." }, 400);
       draft.sent_at = body.sent_at;
       draft.sent_via = body.sent_via;
       draft.sent_proof = (body.sent_proof || "").slice(0, 500);
@@ -361,17 +379,17 @@
       const statement = attachments.length
         ? `in Antwort auf Ihr Schreiben übersende ich ausschließlich die folgenden vorhandenen Unterlagen:\n\nAnlagen: ${attachments.join(", ")}.`
         : "in Antwort auf Ihr Schreiben teile ich mit, dass ich derzeit keine Unterlagen beifügen kann.";
-      let german_text = `Betreff: Ihr Schreiben / Aktenzeichen ${detail.reference_number || "[eintragen]"}\n\nSehr geehrte Damen und Herren,\n\n${statement}\n\nBitte bestätigen Sie den Eingang.\n\nMit freundlichen Grüßen\n[Name eintragen]`;
-      let local_text = "Демонстрационный черновик. Проверьте приложения и данные перед отправкой.";
+      let german_text = "";
+      let local_text = "Демонстрационный черновик. Проверьте приложения и данные перед переводом.";
       if (cloud?.configured && detail.documents?.[0]) {
         const saved = await cloud.getDocument(detail.documents[0].id);
         if (saved.case_id !== detail.id) return reply({ ok: false, error: "Документ не принадлежит этому делу." }, 403);
         const result = await cloud.invoke("reply", {
           text: saved.redacted_text, available_documents: attachments, language: body.language || "ru",
         });
-        german_text = result.reply.german_text;
         local_text = result.reply.local_text;
       }
+      if (!local_text.trim()) return reply({ ok: false, error: "В этом письме ответ не требуется." }, 400);
       const draft = { id: `demo-draft-${Date.now()}`, german_text,
         local_text,
         language: body.language || "ru", created_at: new Date().toISOString() };
@@ -382,6 +400,22 @@
       detail.events.unshift({ id: `demo-event-${Date.now()}`, occurred_at: draft.created_at,
         summary: "Черновик ответа создан", event_type: "draft_created" });
       return reply({ ok: true, case: detail }, 201);
+    }
+    const translateDraft = path.match(/^\/api\/cases\/([^/]+)\/drafts\/([^/]+)\/translate$/);
+    if (translateDraft && method === "POST") {
+      const detail = state.case_details[decodeURIComponent(translateDraft[1])];
+      const draft = detail?.drafts?.find((item) => item.id === decodeURIComponent(translateDraft[2]));
+      if (!draft) return reply({ ok: false, error: "Черновик не найден." }, 404);
+      if (draft.sent_at || body.approved !== true || !String(body.local_text || "").trim())
+        return reply({ ok: false, error: "Проверьте и подтвердите текст на своём языке." }, 400);
+      const result = cloud?.configured && cloud.user
+        ? await cloud.invoke("translate_reply", { text: body.local_text, language: draft.language, approved: true })
+        : { reply: { german_text: "[Демонстрация] Перевод недоступен." } };
+      draft.local_text = body.local_text;
+      draft.german_text = result.reply.german_text;
+      draft.approved_local_at = new Date().toISOString();
+      syncCase(state, detail);
+      return reply({ ok: true, case: detail, draft });
     }
     const caseEvent = path.match(/^\/api\/cases\/([^/]+)\/events$/);
     if (caseEvent && method === "POST") {
