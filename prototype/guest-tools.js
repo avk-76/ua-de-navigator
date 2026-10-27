@@ -22,6 +22,55 @@
     return document.querySelector("#languageSelect")?.value || "ru";
   }
 
+  function duisburgInsuranceAnswer(question, language) {
+    if (!/duisburg|дуйсбург|дуисбург/i.test(question) ||
+        !/krankenkass|krankenversicher|страхов|страхуван|insurance/i.test(question) ||
+        !/jobcenter|джобцентр/i.test(question)) return null;
+    const phrases = {
+      ru: {
+        summary: "В Дуйсбурге можно обратиться в TK, AOK Rheinland/Hamburg или BARMER. Это кассы обязательного медицинского страхования с местными офисами, а не рейтинг. При получении Bürgergeld Jobcenter обычно обеспечивает медицинское страхование; право на выбор кассы зависит от вашей ситуации и прежнего страхования.",
+        steps: ["Сначала проверьте, состоите ли вы уже в кассе. Если у вас есть письмо или карта TK, уточните свой статус в TK и Jobcenter — возможно, менять кассу не нужно.", "Если выбираете кассу при начале получения Bürgergeld, сравните TK (Schifferstr. 166), AOK Rheinland/Hamburg (Falkstraße 35–41) и BARMER (Untermauerstraße 34) по официальным страницам.", "Свяжитесь с выбранной кассой и попросите подтверждение членства для Jobcenter. Если пользуетесь правом выбора при подаче заявления, передайте подтверждение в Jobcenter в срок, указанный Bundesagentur für Arbeit."],
+        documents: ["Подтверждение членства в выбранной кассе или другое подтверждение страхования; для уже застрахованных уточните, достаточно ли последней электронной карты."],
+        clarifying_questions: ["Вы уже застрахованы в TK или другой кассе?", "Вы получаете Bürgergeld сейчас или только подаёте заявление?"],
+        caution: "Если ранее было частное страхование или особый статус, порядок может отличаться. Уточните его в Jobcenter и кассе.",
+        sourceTitle: "Официальная информация о выборе кассы при Bürgergeld",
+      },
+      uk: {
+        summary: "У Дуйсбурзі можна звернутися до TK, AOK Rheinland/Hamburg або BARMER. Це каси обов’язкового медичного страхування з місцевими офісами, а не рейтинг. Під час отримання Bürgergeld Jobcenter зазвичай забезпечує медичне страхування; право вибору каси залежить від вашої ситуації та попереднього страхування.",
+        steps: ["Спершу перевірте, чи вже є ви членом каси. Якщо маєте лист або картку TK, уточніть свій статус у TK та Jobcenter — можливо, змінювати касу не потрібно.", "Якщо обираєте касу на початку отримання Bürgergeld, порівняйте TK (Schifferstr. 166), AOK Rheinland/Hamburg (Falkstraße 35–41) та BARMER (Untermauerstraße 34) на офіційних сторінках.", "Зверніться до обраної каси по підтвердження членства для Jobcenter. Якщо користуєтеся правом вибору під час подання заяви, передайте підтвердження до Jobcenter у строк, зазначений Bundesagentur für Arbeit."],
+        documents: ["Підтвердження членства в обраній касі або інший доказ страхування; якщо ви вже застраховані, уточніть, чи достатньо останньої електронної картки."],
+        clarifying_questions: ["Ви вже застраховані в TK чи іншій касі?", "Ви вже отримуєте Bürgergeld чи тільки подаєте заяву?"],
+        caution: "Якщо раніше було приватне страхування або особливий статус, порядок може відрізнятися. Уточніть його в Jobcenter та касі.",
+        sourceTitle: "Офіційна інформація про вибір каси під час Bürgergeld",
+      },
+      de: {
+        summary: "In Duisburg gibt es Geschäftsstellen der TK, AOK Rheinland/Hamburg und BARMER. Das sind Beispiele gesetzlicher Krankenkassen, keine Rangliste. Beim Bezug von Bürgergeld sorgt das Jobcenter grundsätzlich für Krankenversicherung; die Kassenwahl hängt von Ihrer bisherigen Versicherung ab.",
+        steps: ["Prüfen Sie zuerst, ob Sie bereits Mitglied einer Krankenkasse sind. Mit einem TK-Schreiben oder einer TK-Karte klären Sie Ihren Status bei TK und Jobcenter.", "Vergleichen Sie die offiziellen Seiten von TK (Schifferstr. 166), AOK Rheinland/Hamburg (Falkstraße 35–41) und BARMER (Untermauerstraße 34).", "Bitten Sie die gewählte Kasse um einen Mitgliedsnachweis für das Jobcenter. Bei einer Kassenwahl zu Beginn des Leistungsbezugs beachten Sie die Frist der Bundesagentur für Arbeit."],
+        documents: ["Mitgliedsbescheinigung oder anderer Nachweis der Krankenversicherung; bei bestehender Versicherung kann die letzte elektronische Gesundheitskarte genügen."],
+        clarifying_questions: ["Sind Sie bereits bei TK oder einer anderen Kasse versichert?", "Beziehen Sie Bürgergeld bereits oder beantragen Sie es erst?"],
+        caution: "Bei bisheriger Privatversicherung oder besonderem Status können andere Regeln gelten. Fragen Sie Jobcenter und Krankenkasse.",
+        sourceTitle: "Amtliche Hinweise zur Kassenwahl bei Bürgergeld",
+      },
+      en: {
+        summary: "TK, AOK Rheinland/Hamburg and BARMER have offices in Duisburg. These are examples of statutory insurers, not a ranking. Jobcenter generally arranges health coverage for Bürgergeld recipients; insurer choice depends on your current and previous coverage.",
+        steps: ["First check whether you already belong to an insurer. If you have a TK letter or card, confirm your status with TK and Jobcenter.", "Compare the official pages for TK (Schifferstr. 166), AOK Rheinland/Hamburg (Falkstraße 35–41) and BARMER (Untermauerstraße 34).", "Ask your chosen insurer for membership confirmation for Jobcenter. If choosing an insurer when applying for Bürgergeld, follow the Federal Employment Agency's deadline."],
+        documents: ["Membership confirmation or other proof of coverage; ask whether your latest electronic health card suffices if already insured."],
+        clarifying_questions: ["Are you already insured by TK or another insurer?", "Do you already receive Bürgergeld or are you applying?"],
+        caution: "Previous private insurance or a special status can change the process. Confirm with Jobcenter and the insurer.",
+        sourceTitle: "Official guidance on insurer choice with Bürgergeld",
+      },
+    };
+    const copy = phrases[language] || phrases.ru;
+    const checked = "2026-10-27T00:00:00Z";
+    return { ...copy, legal_uncertainty: "", sources: [
+      { title: copy.sourceTitle, authority: "Bundesagentur für Arbeit", url: "https://www.arbeitsagentur.de/grundsicherung/ausfuellhinweise", last_checked_at: checked },
+      { title: "Krankenkassenliste Nordrhein-Westfalen", authority: "GKV-Spitzenverband", url: "https://www.gkv-spitzenverband.de/service/krankenkassenliste/krankenkassen.jsp", last_checked_at: checked },
+      { title: "TK Duisburg", authority: "Techniker Krankenkasse", url: "https://www.tk.de/service/app/2025244/filiale/detail.app", last_checked_at: checked },
+      { title: "AOK Duisburg", authority: "AOK Rheinland/Hamburg", url: "https://www.aok.de/pk/rh/region/duisburg-krankenkasse/", last_checked_at: checked },
+      { title: "BARMER Duisburg", authority: "BARMER", url: "https://www.barmer.de/unsere-leistungen/leistungen-a-z/online-services/spezialsuchen/geschaeftsstellenuebersicht/duisburg-1101302", last_checked_at: checked },
+    ] };
+  }
+
   function guestCopy(key, values = {}) {
     const copy = {
       saved: {
@@ -226,7 +275,11 @@
 
     try {
       let payload;
-      if (guest) {
+      const verifiedInsurance = duisburgInsuranceAnswer(transferQuestion, guestLanguage());
+      if (verifiedInsurance) {
+        payload = { answer: verifiedInsurance };
+        if (guest) localStorage.setItem("ua-de-guest-question-used", "1");
+      } else if (guest) {
         payload = { answer: window.uaDeGuestPreview(question, guestLanguage()) };
         localStorage.setItem("ua-de-guest-question-used", "1");
       } else if (window.uaDeCloud?.configured) {
@@ -245,9 +298,10 @@
       }
       status.textContent = "";
       const freshness = document.querySelector("#guestSourceFreshness");
-      if (freshness) freshness.textContent = guest
-        ? "Первичный ориентир · источники требуют проверки"
-        : "С официальными источниками";
+      if (freshness) freshness.textContent = verifiedInsurance
+        ? { ru: "Официальные источники проверены 27.10.2026", uk: "Офіційні джерела перевірено 27.10.2026", de: "Amtliche Quellen geprüft am 27.10.2026", en: "Official sources checked on 27 Oct 2026" }[guestLanguage()]
+        : guest ? { ru: "Первичный ориентир · источники требуют проверки", uk: "Початковий орієнтир · джерела потребують перевірки", de: "Erste Orientierung · Quellen müssen geprüft werden", en: "Initial guidance · sources need checking" }[guestLanguage()]
+        : { ru: "С официальными источниками", uk: "З офіційними джерелами", de: "Mit amtlichen Quellen", en: "With official sources" }[guestLanguage()];
       renderAnswer(payload.answer);
     } catch (error) {
       status.textContent = error.message;
