@@ -214,6 +214,10 @@ document.querySelectorAll(".profile-nav button").forEach((button) => {
 
 async function bootstrapPortal() {
   try {
+    if (window.uaDeCloud?.configured) {
+      await window.uaDeCloud.ready;
+      if (!window.uaDeCloud.user) return;
+    }
     const [dashboardPayload, casesPayload] = await Promise.all([
       apiRequest("/api/dashboard"),
       apiRequest("/api/cases"),
@@ -938,3 +942,6 @@ window.addEventListener("ua-de:languagechange", () => {
 
 navigatePortal(location.hash.slice(1), { fromHash: true, instant: true });
 bootstrapPortal();
+window.addEventListener("ua-de:authchange", (event) => {
+  if (event.detail?.signedIn) bootstrapPortal();
+});

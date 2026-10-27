@@ -61,12 +61,12 @@ def main() -> None:
     index_path = DIST / "index.html"
     html = index_path.read_text(encoding="utf-8")
     html = html.replace(
-        '<link rel="stylesheet" href="./onboarding.css" />',
-        '<link rel="stylesheet" href="./onboarding.css" />\n    <link rel="stylesheet" href="./demo.css" />',
+        '<link rel="stylesheet" href="./onboarding.css?v=20261027-guest" />',
+        '<link rel="stylesheet" href="./onboarding.css?v=20261027-guest" />\n    <link rel="stylesheet" href="./demo.css?v=20261027-guest" />',
     )
     html = re.sub(
         r'(<script src="\./portal\.js(?:\?[^\"]*)?"></script>)',
-        r'<script src="./demo-api.js"></script>\n    \1',
+        r'<script src="./demo-api.js?v=20261027-guest"></script>\n    \1',
         html,
         count=1,
     )
