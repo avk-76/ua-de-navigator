@@ -17,6 +17,14 @@
   const leadFormStatus = document.querySelector("#leadFormStatus");
   const requestedSupport = document.querySelector("#requestedSupport");
   const leadCaptureTitle = document.querySelector("#leadCaptureTitle");
+  const family = window.uaDeFamilyRoute;
+  const destination = window.uaDeDestinationRoute;
+  const destinationForm = document.querySelector("#destinationRouteForm");
+  const destinationResult = document.querySelector("#destinationRouteResult");
+  const localRoute = ["127.0.0.1", "localhost", "::1"].includes(location.hostname);
+  const familyPeople = document.querySelector("#familyPeople");
+  let people = [{ id: "p1", role: "self", age: "", citizenship: "ua", arrival_date: "", document: "unknown", insurance: "unknown", capacity: "unknown", care: "unknown" }];
+  let applicationStates = {};
   let currentStep = 1;
   let isBuilding = false;
   let currentRoute = null;
@@ -40,8 +48,7 @@
       },
       continue: { ru: "Продолжить", uk: "Продовжити", de: "Weiter", en: "Continue" },
       build: { ru: "Построить маршрут", uk: "Побудувати маршрут", de: "Route erstellen", en: "Build route" },
-      sourcesChecked: { ru: "Официальные источники проверены", uk: "Офіційні джерела перевірено", de: "Offizielle Quellen geprüft", en: "Official sources checked" },
-      sourcesReview: { ru: "Часть источников требует повторной проверки", uk: "Частина джерел потребує повторної перевірки", de: "Einige Quellen müssen erneut geprüft werden", en: "Some sources need another check" },
+      sourcesReview: { ru: "Проверена доступность страниц; условия требуют уточнения", uk: "Перевірено доступність сторінок; умови треба уточнити", de: "Seiten erreichbar; Voraussetzungen prüfen", en: "Pages reachable; check eligibility" },
     };
     return copy[key]?.[onboardingLanguage()] || copy[key]?.ru;
   }
@@ -80,22 +87,71 @@
       validation.textContent = "Выберите хотя бы одну цель.";
       return false;
     }
+    if (currentStep === 1) {
+      if (!form.elements.destination_city.value.trim()) {
+        validation.textContent = destination.labels.destinationHint[onboardingLanguage()];
+        form.elements.destination_city.focus();
+        return false;
+      }
+      const city = form.elements.city.value.trim();
+      const postal = form.elements.postal_code.value.trim();
+      if (postal && !/^\d{5}$/.test(postal)) { validation.textContent = "Укажите пятизначный немецкий индекс."; return false; }
+      if (city && postal && /^(überlingen|ueberlingen)$/i.test(city) && postal !== "88662") {
+        validation.textContent = "Город и индекс не совпадают. Проверьте адрес проживания."; return false;
+      }
+    }
     return true;
   }
 
+  function renderPeople() {
+    familyPeople.innerHTML = people.map((person, index) => family.personEditor(person, index, onboardingLanguage())).join("");
+  }
+
+  familyPeople.addEventListener("input", (event) => {
+    const card = event.target.closest("[data-person-index]");
+    const key = event.target.dataset.personField;
+    if (card && key) people[Number(card.dataset.personIndex)][key] = event.target.value;
+  });
+  familyPeople.addEventListener("change", (event) => {
+    const card = event.target.closest("[data-person-index]");
+    const key = event.target.dataset.personField;
+    if (card && key) people[Number(card.dataset.personIndex)][key] = event.target.value;
+  });
+  familyPeople.addEventListener("click", (event) => {
+    const index = event.target.dataset.removePerson;
+    if (index !== undefined) { people.splice(Number(index), 1); renderPeople(); }
+  });
+  document.querySelector("#addFamilyPerson")?.addEventListener("click", () => {
+    people.push({ id: `p${Date.now()}`, role: "other", age: "", citizenship: "unknown", arrival_date: "", document: "unknown", insurance: "unknown", capacity: "unknown", care: "unknown" });
+    renderPeople();
+  });
+
   function collectAnswers() {
+    const destinationAnswers = Object.fromEntries(
+      [...destinationForm.querySelectorAll("[name]")].map((field) => [field.name, field.value.trim()]),
+    );
     return {
+      ...destinationAnswers,
       stage: selectedRadio("stage"),
       housing: selectedRadio("housing"),
       funding: selectedRadio("funding"),
       work_capacity: selectedRadio("work_capacity"),
-      family: form.elements.family.value,
+      city: form.elements.city.value.trim(),
+      postal_code: form.elements.postal_code.value.trim(),
+      monthly_rent: form.elements.monthly_rent.value,
+      has_car: form.elements.has_car.value,
+      family: people.length > 1 ? "mixed" : "alone",
+      people: structuredClone(people),
+      application_states: structuredClone(applicationStates),
       has_ukrainian_fop: form.elements.has_ukrainian_fop.checked,
       goals: [...form.querySelectorAll('input[name="goals"]:checked')].map((input) => input.value),
     };
   }
 
   function applyAnswers(answers) {
+    for (const field of destinationForm.querySelectorAll("[name]")) {
+      if (answers[field.name] != null) field.value = answers[field.name];
+    }
     ["stage", "housing", "funding", "work_capacity"].forEach((name) => {
       const value = answers[name];
       const input = value
@@ -103,9 +159,12 @@
         : null;
       if (input) input.checked = true;
     });
-    if (answers.family && form.elements.family) {
-      form.elements.family.value = answers.family;
+    for (const name of ["city", "postal_code", "monthly_rent", "has_car"]) {
+      if (form.elements[name] && answers[name] != null) form.elements[name].value = answers[name];
     }
+    if (Array.isArray(answers.people) && answers.people.length) people = structuredClone(answers.people);
+    applicationStates = structuredClone(answers.application_states || {});
+    renderPeople();
     form.elements.has_ukrainian_fop.checked = Boolean(answers.has_ukrainian_fop);
     const selectedGoals = new Set(answers.goals || []);
     form.querySelectorAll('input[name="goals"]').forEach((input) => {
@@ -119,10 +178,13 @@
     backButton.disabled = true;
     nextButton.disabled = true;
     const originalLabel = nextButton.querySelector("span:first-child").textContent;
-    nextButton.querySelector("span:first-child").textContent = "Проверяем источники…";
-    validation.textContent = "Собираем маршрут и проверяем актуальность.";
+    nextButton.querySelector("span:first-child").textContent = "Строим маршрут…";
+    validation.textContent = "Сопоставляем ответы с компетентными ведомствами.";
     try {
-      if (window.uaDeCloud?.configured) await window.uaDeSourceRefresh;
+      // A source reachability check is advisory and must never block a local route.
+      if (!localRoute && window.uaDeCloud?.configured && window.uaDeSourceRefresh) {
+        await Promise.resolve(window.uaDeSourceRefresh).catch(() => null);
+      }
       const payload = await apiRequest("/api/onboarding/route", {
         method: "POST",
         body: JSON.stringify({ answers: collectAnswers() }),
@@ -147,6 +209,16 @@
 
   function renderRoute(route) {
     currentRoute = route;
+    destination.render(destination.evaluate(collectAnswers()), onboardingLanguage(), destinationResult);
+    const plan = family.build(collectAnswers(), onboardingLanguage());
+    window.dispatchEvent(new CustomEvent("ua-de:route-location", { detail: plan.location }));
+    resultSection.classList.add("has-family-plan");
+    family.render(plan, onboardingLanguage(), async (id, key, value) => {
+      applicationStates[id] = { ...(applicationStates[id] || {}), [key]: value };
+      try {
+        await apiRequest("/api/onboarding/route", { method: "POST", body: JSON.stringify({ answers: collectAnswers() }) });
+      } catch (error) { validation.textContent = `Статус не сохранён: ${error.message}`; }
+    });
     setOnboardingText("#arrivalRouteTitle", route.arrival_track.title);
     setOnboardingText("#arrivalRouteLabel", route.arrival_track.label);
     setOnboardingText("#arrivalRouteDescription", route.arrival_track.description);
@@ -157,9 +229,8 @@
 
     const freshness = document.querySelector("#routeFreshness");
     if (freshness) {
-      const isFresh = route.source_freshness === "fresh";
-      freshness.className = `source-freshness ${isFresh ? "is-fresh" : "needs-review"}`;
-      freshness.textContent = isFresh ? onboardingCopy("sourcesChecked") : onboardingCopy("sourcesReview");
+      freshness.className = "source-freshness needs-review";
+      freshness.textContent = onboardingCopy("sourcesReview");
     }
 
     const stepsContainer = document.querySelector("#generatedRouteSteps");
@@ -200,8 +271,9 @@
   function sourceStatusLabel(status) {
     const language = onboardingLanguage();
     const labels = {
-      verified_online: { ru: "проверено онлайн", uk: "перевірено онлайн", de: "online geprüft", en: "checked online" },
-      verified_manual: { ru: "проверено по официальной странице", uk: "перевірено за офіційною сторінкою", de: "anhand der offiziellen Seite geprüft", en: "checked against the official page" },
+      available_online: { ru: "страница доступна онлайн", uk: "сторінка доступна онлайн", de: "Seite online erreichbar", en: "page reachable online" },
+      verified_online: { ru: "страница доступна онлайн", uk: "сторінка доступна онлайн", de: "Seite online erreichbar", en: "page reachable online" },
+      verified_manual: { ru: "источник внесён вручную; содержание перепроверить", uk: "джерело внесено вручну; зміст перевірити", de: "manuell erfasst; Inhalt prüfen", en: "entered manually; review content" },
       needs_review: { ru: "страница изменилась — нужна проверка", uk: "сторінка змінилася — потрібна перевірка", de: "Seite geändert — Prüfung nötig", en: "page changed — review needed" },
       temporarily_unavailable: { ru: "источник временно недоступен", uk: "джерело тимчасово недоступне", de: "Quelle vorübergehend nicht erreichbar", en: "source temporarily unavailable" },
     };
@@ -265,13 +337,20 @@
     showStep(1);
     routeBuilder.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+  destinationResult.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-check-destination]");
+    if (!button) return;
+    for (const field of destinationForm.querySelectorAll("select[name^='destination_']")) field.value = "unknown";
+    form.elements.destination_city.value = button.dataset.checkDestination;
+    editButton?.click();
+  });
 
   refreshSourcesButton?.addEventListener("click", async () => {
     const originalLabel = refreshSourcesButton.textContent;
     refreshSourcesButton.disabled = true;
     refreshSourcesButton.textContent = "Проверяем официальные страницы…";
     try {
-      if (window.uaDeCloud?.configured) {
+      if (!localRoute && window.uaDeCloud?.configured) {
         window.uaDeSourceRefresh = window.uaDeCloud.invoke("sources");
         await window.uaDeSourceRefresh;
       } else await apiRequest("/api/official-sources/refresh", { method: "POST", body: "{}" });
@@ -352,9 +431,13 @@
     }
   });
 
+  destination.renderForm(destinationForm, onboardingLanguage());
   showStep(1);
+  renderPeople();
   window.addEventListener("ua-de:languagechange", () => {
+    destination.renderForm(destinationForm, onboardingLanguage());
     showStep(currentStep);
+    renderPeople();
     if (currentRoute) renderRoute(currentRoute);
   });
   const welcomeCredits = document.querySelector("#welcomeCredits");

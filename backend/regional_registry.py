@@ -10,6 +10,23 @@ VERIFIED_AT = "2026-07-27T00:00:00+00:00"
 
 REGIONS: list[dict[str, Any]] = [
     {
+        "slug": "baden-wuerttemberg-ueberlingen",
+        "name": "Baden-Württemberg · Bodenseekreis",
+        "short_name": "BW · Überlingen",
+        "pilot_priority": 0,
+        "focus_city": "Überlingen",
+        "intake_status": "municipal_and_district_route",
+        "status_note": "Для Überlingen компетентна городская Ausländerbehörde; Jobcenter и Sozialamt — Bodenseekreis. Подачу и условия нужно сверить лично.",
+        "verification": {"level": "official_pages_reviewed", "last_verified_at": "2026-10-27T00:00:00+00:00", "refresh_interval_hours": 72},
+        "services": [
+            {"id": "ue-abh", "category": "migration_office", "name": "Stadt Überlingen · Ausländerwesen", "address": "Überlingen", "phone": "", "email": "", "url": "https://www.ueberlingen.de/-/behoerdenwegweiser/auslaenderwesen/oe6008056", "intake_status": "check_conditions", "audience": "Жители Überlingen", "note": "Городская Ausländerbehörde; запись и документы уточнить на официальном сайте.", "verification_level": "official_pages_reviewed", "last_verified_at": "2026-10-27T00:00:00+00:00"},
+            {"id": "ue-jobcenter", "category": "jobcenter", "name": "Jobcenter Bodenseekreis", "address": "Albrechtstraße 75, 88045 Friedrichshafen", "phone": "07541 204-3800", "email": "jobcenter@bodenseekreis.de", "url": "https://www.bodenseekreis.de/soziales-gesundheit/arbeitslosigkeit-jobcenter/beratungsstelle-jobcenter-infotelefon/", "intake_status": "appointment", "audience": "Жители Bodenseekreis", "note": "SGB II; условия для каждого члена семьи уточнить отдельно.", "verification_level": "official_pages_reviewed", "last_verified_at": "2026-10-27T00:00:00+00:00"},
+            {"id": "ue-social", "category": "social_office", "name": "Sozialamt Bodenseekreis", "address": "Glärnischstraße 1–3, 88045 Friedrichshafen", "phone": "07541 204-5198", "email": "grundsicherung@bodenseekreis.de", "url": "https://www.bodenseekreis.de/soziales-gesundheit/geldleistungen/sozialhilfe/grundsicherung/", "intake_status": "check_conditions", "audience": "Жители Bodenseekreis", "note": "SGB XII, в частности Grundsicherung im Alter.", "verification_level": "official_pages_reviewed", "last_verified_at": "2026-10-27T00:00:00+00:00"},
+            {"id": "ue-wohngeld", "category": "housing_benefit", "name": "Stadt Überlingen · Soziales / Wohngeld", "address": "Christophstraße 1, 88662 Überlingen", "phone": "", "email": "", "url": "https://www.ueberlingen.de/sozialleistungen", "intake_status": "check_conditions", "audience": "Жители Überlingen", "note": "Местная приёмная для заявлений на Wohngeld.", "verification_level": "official_pages_reviewed", "last_verified_at": "2026-10-27T00:00:00+00:00"},
+            {"id": "ue-care", "category": "care_advice", "name": "Pflegestützpunkt Bodenseekreis · Überlingen", "address": "Christophstraße 1, 88662 Überlingen", "phone": "", "email": "pflegestuetzpunkt@bodenseekreis.de", "url": "https://www.bodenseekreis.de/soziales-gesundheit/behinderung/pflegestuetzpunkt/ansprechpersonen-aussenberatungsstellen/", "intake_status": "check_conditions", "audience": "Жители Bodenseekreis", "note": "Консультация по уходу в Überlingen; время сверить перед визитом.", "verification_level": "official_pages_reviewed", "last_verified_at": "2026-10-27T00:00:00+00:00"},
+        ],
+    },
+    {
         "slug": "north-rhine-westphalia",
         "name": "Nordrhein-Westfalen",
         "short_name": "NRW",

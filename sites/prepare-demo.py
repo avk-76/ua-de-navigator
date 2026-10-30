@@ -30,6 +30,12 @@ def main() -> None:
         shutil.copytree(PROTOTYPE / "vendor", DIST / "vendor", dirs_exist_ok=True)
     for name in ("demo-api.js", "demo.css"):
         shutil.copy2(PUBLISHED / name, DIST / name)
+    if "--offline" in sys.argv:
+        config_path = DIST / "cloud-config.js"
+        config_path.write_text(
+            config_path.read_text(encoding="utf-8").replace("enabled: true", "enabled: false"),
+            encoding="utf-8",
+        )
 
     with tempfile.TemporaryDirectory(prefix="uade-public-demo-", dir=SITE) as temp_dir:
         store = NavigatorStore(Path(temp_dir) / "synthetic.db")

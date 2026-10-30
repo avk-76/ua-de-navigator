@@ -1320,7 +1320,7 @@ class NavigatorStore:
     def update_official_source_checks(self, results: list[dict[str, Any]]) -> list[dict[str, Any]]:
         with self.connect() as connection:
             for result in results:
-                if result["status"] in {"verified_online", "needs_review"}:
+                if result["status"] in {"available_online", "needs_review"}:
                     connection.execute(
                         """
                         UPDATE official_sources

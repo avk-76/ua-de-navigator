@@ -24,7 +24,7 @@
           <nav class="quiet-nav" aria-label="Основная навигация">
             <button type="button" data-start-route>Персональный маршрут</button>
             <button type="button" data-route="document">Разобрать документ</button>
-            <button type="button" data-open-question>Задать вопрос</button>
+            <button type="button" data-open-question>Ваш ИИ-помощник</button>
           </nav>
 
           <div class="header-tools">
@@ -75,7 +75,7 @@
               <div class="onboarding-trust-row">
                 <span>5–7 минут</span>
                 <span>Без регистрации до результата</span>
-                <span>Актуальные официальные источники</span>
+                <span>Официальные ссылки для проверки</span>
               </div>
             </div>
             <aside class="onboarding-hero-aside welcome-pack-preview">
@@ -389,6 +389,12 @@
                     <small>Есть Anmeldung, §24 или Fiktionsbescheinigung.</small>
                   </label>
                 </div>
+                <div id="destinationRouteForm" class="destination-route-form"></div>
+                <div class="route-inline-fields place-fields">
+                  <label><span>Город проживания</span><input name="city" id="onboardingCity" autocomplete="address-level2" placeholder="Например, Überlingen" /></label>
+                  <label><span>Почтовый индекс</span><input name="postal_code" id="onboardingPostal" inputmode="numeric" pattern="[0-9]{5}" placeholder="88662" /></label>
+                </div>
+                <p class="route-location-note">Если город ещё неизвестен, покажем официальный поиск ведомства без адреса соседнего района.</p>
               </fieldset>
 
               <fieldset class="route-step" data-onboarding-step="2" hidden>
@@ -437,6 +443,10 @@
                     </label>
                   </div>
                 </div>
+                <div class="route-inline-fields place-fields">
+                  <label><span>Аренда с отоплением, € в месяц (если известна)</span><input type="number" min="0" step="0.01" name="monthly_rent" /></label>
+                  <label><span>Есть автомобиль?</span><select name="has_car"><option value="unknown">Неизвестно</option><option value="yes">Да</option><option value="no">Нет</option></select></label>
+                </div>
               </fieldset>
 
               <fieldset class="route-step" data-onboarding-step="3" hidden>
@@ -471,16 +481,6 @@
                   </div>
                 </div>
                 <div class="route-inline-fields">
-                  <label>
-                    <span>Кто едет с вами?</span>
-                    <select name="family" id="onboardingFamily">
-                      <option value="alone">Еду один / одна</option>
-                      <option value="partner">Супруг или партнёр</option>
-                      <option value="children">Несовершеннолетние дети</option>
-                      <option value="parents">Родители</option>
-                      <option value="mixed">Несколько членов семьи</option>
-                    </select>
-                  </label>
                   <label class="route-switch">
                     <input type="checkbox" name="has_ukrainian_fop" />
                     <span>
@@ -488,6 +488,12 @@
                       <small>Добавим налоговый и предпринимательский контекст.</small>
                     </span>
                   </label>
+                </div>
+                <div class="family-map-editor">
+                  <div class="landing-section-head"><div><p class="section-label">КАРТА СЕМЬИ</p><h3>Кто живёт вместе с вами?</h3></div></div>
+                  <p>Для каждого человека — отдельная проверка. Имена и номера документов не нужны.</p>
+                  <div id="familyPeople"></div>
+                  <button class="secondary-button" type="button" id="addFamilyPerson">Добавить человека +</button>
                 </div>
               </fieldset>
 
@@ -550,6 +556,12 @@
               </div>
               <span class="source-freshness" id="routeFreshness">Проверяем источники…</span>
             </div>
+            <section class="destination-route-result" id="destinationRouteResult" aria-label="Проверка выбранного города"></section>
+            <section class="family-result" id="familyResult" aria-label="Что делать семье дальше">
+              <div class="family-next" id="familyNext"></div>
+              <div class="family-summary" id="familySummary"></div>
+              <details class="family-details" id="familyDetails"><summary>Что ещё не оформлено у каждого из нас? →</summary><div id="familyActions"></div></details>
+            </section>
             <div class="result-delight">
               <span aria-hidden="true">✓</span>
               <p><strong>Мы сопоставили ваши ответы.</strong> Ниже — первый маршрут, ближайшие действия и возможности, которые можно развивать параллельно.</p>
@@ -1385,6 +1397,8 @@
     <script src="./portal.js?v=20261027-fixes"></script>
     <script src="./guest-preview.js?v=20261027-guest"></script>
     <script src="./guest-tools.js?v=20261027-fixes"></script>
+    <script src="./destination-route.js"></script>
+    <script src="./family-route.js"></script>
     <script src="./onboarding.js"></script>
     <script src="./regional-support.js"></script>
     <script src="./local-document.js?v=20261027-fixes"></script>

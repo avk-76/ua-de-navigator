@@ -73,7 +73,6 @@ def utc_now() -> str:
 
 
 def source_seed_rows() -> list[dict[str, Any]]:
-    checked_at = utc_now()
     return [
         {
             "id": source["id"],
@@ -82,11 +81,11 @@ def source_seed_rows() -> list[dict[str, Any]]:
             "authority": source["authority"],
             "url": source["url"],
             "summary": source["summary"],
-            "status": "verified_manual",
-            "last_checked_at": checked_at,
-            "last_http_status": 200,
+            "status": "needs_review",
+            "last_checked_at": None,
+            "last_http_status": None,
             "content_hash": None,
-            "validation_notes": "Проверено по официальному источнику при создании маршрутизатора.",
+            "validation_notes": "Источник внесён в каталог; содержание и применимость правила не проверены.",
         }
         for source in OFFICIAL_SOURCES
     ]
@@ -126,12 +125,12 @@ def refresh_source(source: dict[str, Any], timeout: float = 4.0) -> dict[str, An
             valid, missing = _validate_terms(text, source["required_term_groups"])
             return {
                 "id": source["id"],
-                "status": "verified_online" if valid else "needs_review",
+                "status": "available_online" if valid else "needs_review",
                 "last_checked_at": checked_at,
                 "last_http_status": response.status,
                 "content_hash": hashlib.sha256(payload).hexdigest(),
                 "validation_notes": (
-                    "Официальная страница доступна, контрольные положения найдены."
+                    "Официальная страница доступна, контрольные слова найдены; содержание и применимость не проверены."
                     if valid
                     else f"Страница доступна, но контрольные формулировки изменились: {', '.join(missing)}."
                 ),
@@ -308,9 +307,7 @@ def build_route(answers: dict[str, Any], sources: list[dict[str, Any]]) -> dict[
         for item in sources
         if item["topic"] in source_topics
     ]
-    freshness = "fresh" if used_sources and all(
-        item["status"] in {"verified_online", "verified_manual"} for item in used_sources
-    ) else "review_required"
+    freshness = "review_required"
 
     return {
         "version": "route-engine-0.1",
@@ -323,7 +320,7 @@ def build_route(answers: dict[str, Any], sources: list[dict[str, Any]]) -> dict[
         "sources": used_sources,
         "notice": (
             "Это предварительный маршрут, а не решение ведомства. "
-            "Перед подачей заявления система повторно проверяет действующие правила и исходные документы."
+            "HTTP-проверка показывает только доступность страницы. Действующие правила, место и исходные документы нужно сверить отдельно."
         ),
     }
 

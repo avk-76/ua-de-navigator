@@ -23,6 +23,7 @@
         food_support: "продуктовая помощь", interpreters: "переводчики",
       },
       regionNotes: {
+        "baden-wuerttemberg-ueberlingen": "Для Überlingen компетентна городская Ausländerbehörde; Jobcenter и Sozialamt — Bodenseekreis, Wohngeld — Stadt Überlingen.",
         "north-rhine-westphalia": "Первая официальная точка для прибывших без жилья — LEA Bochum. Родственники, жильё, работа или учёба могут обосновать просьбу о конкретном городе, но решение принимает ведомство.",
         berlin: "Для первичного обращения используется Ankunftszentrum Ukraine в Reinickendorf. Часы приёма нужно проверять перед поездкой.",
         "baden-wuerttemberg-konstanz": "В Landkreis Konstanz приём продолжается по земельной и районной квоте. При частном жилье первый шаг — регистрация по месту жительства.",
@@ -48,6 +49,7 @@
         food_support: "продуктова допомога", interpreters: "перекладачі",
       },
       regionNotes: {
+        "baden-wuerttemberg-ueberlingen": "В Überlingen відповідальна міська Ausländerbehörde; Jobcenter і Sozialamt — Bodenseekreis, Wohngeld — Stadt Überlingen.",
         "north-rhine-westphalia": "Перша офіційна точка для прибулих без житла — LEA Bochum. Родичі, житло, робота чи навчання можуть обґрунтувати прохання про конкретне місто, але рішення ухвалює установа.",
         berlin: "Для першого звернення використовується Ankunftszentrum Ukraine у Reinickendorf. Години прийому слід перевірити перед поїздкою.",
         "baden-wuerttemberg-konstanz": "У Landkreis Konstanz прийом триває за земельною та районною квотою. За приватного житла перший крок — реєстрація місця проживання.",
@@ -73,6 +75,7 @@
         food_support: "Lebensmittelhilfe", interpreters: "Sprachmittlung",
       },
       regionNotes: {
+        "baden-wuerttemberg-ueberlingen": "In Überlingen ist die städtische Ausländerbehörde zuständig; Jobcenter und Sozialamt liegen beim Bodenseekreis, Wohngeld bei der Stadt.",
         "north-rhine-westphalia": "Die erste offizielle Anlaufstelle ohne Unterkunft ist die LEA Bochum. Familie, Wohnraum, Arbeit oder Studium können einen Ortswunsch begründen; die Behörde entscheidet.",
         berlin: "Für die erste Vorsprache dient das Ankunftszentrum Ukraine in Reinickendorf. Öffnungszeiten sind vor der Anreise zu prüfen.",
         "baden-wuerttemberg-konstanz": "Im Landkreis Konstanz erfolgt die Aufnahme nach Landes- und Kreisquote. Bei privater Unterkunft ist die Wohnsitzanmeldung der erste Schritt.",
@@ -98,6 +101,7 @@
         food_support: "food support", interpreters: "interpreters",
       },
       regionNotes: {
+        "baden-wuerttemberg-ueberlingen": "Überlingen has its city Ausländerbehörde; Jobcenter and Sozialamt are in Bodenseekreis, and housing benefit is handled by the city.",
         "north-rhine-westphalia": "The first official point for arrivals without accommodation is LEA Bochum. Family, housing, work or study may support a city request, but the authority decides.",
         berlin: "The initial contact point is the Ukraine Arrival Centre in Reinickendorf. Check opening hours before travelling.",
         "baden-wuerttemberg-konstanz": "The Konstanz district receives people under state and district quotas. With private housing, address registration is the first step.",
@@ -209,6 +213,25 @@
     applyStaticCopy();
     renderPicker();
     if (selectedRegion) renderRegion(selectedRegion);
+  });
+  window.addEventListener("ua-de:route-location", (event) => {
+    const location = event.detail || {};
+    const picker = document.querySelector("#regionalPicker");
+    if (location.known && location.city === "Überlingen") {
+      picker.hidden = true;
+      selectRegion("baden-wuerttemberg-ueberlingen");
+    } else {
+      picker.hidden = true;
+      selectedRegion = null;
+      document.querySelector("#regionalStatusName").textContent = location.city || "";
+      document.querySelector("#regionalStatusText").textContent = {
+        ru: "Точное местное ведомство пока не установлено. Используйте официальный поиск по месту проживания.",
+        uk: "Точну місцеву установу ще не встановлено. Скористайтеся офіційним пошуком за місцем проживання.",
+        de: "Die örtlich zuständige Stelle ist noch nicht ermittelt. Nutzen Sie die amtliche Suche für Ihren Wohnort.",
+        en: "The local authority is not yet identified. Use the official directory for your address.",
+      }[language()] || "";
+      document.querySelector("#regionalServiceGrid").innerHTML = "";
+    }
   });
 
   applyStaticCopy();

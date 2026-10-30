@@ -2,6 +2,10 @@
 
 Existing UA-DE Navigator prototype with three entry points: a personal route, a German letter, and a question. The interface supports Russian, Ukrainian, German, and English.
 
+## Working and release flow
+
+GitHub is the source of truth. Edit the source in `prototype/`, commit and push the change, and test the published browser journey with invented data. The public GitHub Pages test version uses the generated `docs/` folder; a source-only push does not update that site. Supabase functions and database migrations need separate deployment and verification. Create a separate backup when requested. A short handoff for future chats is in [ROUTE_HANDOFF.md](ROUTE_HANDOFF.md).
+
 ## View online
 
 - [GitHub Pages test version](https://avk-76.github.io/ua-de-navigator/)
@@ -38,6 +42,17 @@ node sites/verify-demo.mjs
 ```
 
 The GitHub Pages source is in `docs/`. It is generated from `prototype/` by `sites/prepare-demo.py` using invented fixtures for unsigned visitors. Signed-in client data is stored separately in Supabase. `backend/` contains the local server, rules, storage, and tests.
+
+## Local review before publication
+
+Prepare a browser-only preview with invented data and cloud calls disabled:
+
+```powershell
+& 'C:\Users\avk-7\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe' sites/prepare-demo.py --offline
+node tools/dev-server.mjs
+```
+
+Open `http://127.0.0.1:8765/sites/dist/index.html`. This preview includes the personal route, family action cards, local image/PDF OCR, and synthetic case flows. It does not have live AI, confirmed email accounts, or durable per-user storage. The route is deterministic guidance and does not calculate benefit amounts. Use only invented data in this preview. The configured cloud AI and account flows require the deployed, allowed origin and remain a separate integration check before publication.
 
 ## Current limits
 

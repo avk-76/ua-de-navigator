@@ -62,7 +62,7 @@ async function checkSource(source: Source) {
     const body = (await response.text()).slice(0, 2_000_000);
     const extracted = plain(body);
     if (response.ok && extracted.length > 500 && !/access denied|captcha|403 forbidden/i.test(extracted.slice(0, 500))) {
-      status = "verified_online";
+      status = "available_online";
       content_hash = await hash(extracted);
       source_excerpt = extracted.slice(0, 4000);
     } else validation_notes = `Page could not be validated (HTTP ${response.status}, ${extracted.length} text characters).`;
@@ -96,8 +96,8 @@ async function rateLimit(userId: string) {
 }
 
 function sourceContext(sources: Awaited<ReturnType<typeof refreshSources>>) {
-  return sources.filter((source) => source.status === "verified_online").map((source) =>
-    `[${source.id}] ${source.title}\n${source.url}\nПроверено: ${source.last_checked_at}\n${source.source_excerpt.slice(0, 1300)}`,
+  return sources.filter((source) => source.status === "available_online").map((source) =>
+    `[${source.id}] ${source.title}\n${source.url}\nДоступность проверена: ${source.last_checked_at}\n${source.source_excerpt.slice(0, 1300)}`,
   ).join("\n\n---\n\n");
 }
 
@@ -207,7 +207,7 @@ Deno.serve(async (request) => {
         clarifying_questions: Array.isArray(answer.clarifying_questions) ? answer.clarifying_questions.slice(0, 5) : [],
         caution: String(answer.caution || "Проверьте сведения в ведомстве перед действием."),
         legal_uncertainty: String(answer.legal_uncertainty || "Юридические выводы требуют проверки."),
-        sources: sources.filter((source) => cited.has(source.id) && source.status === "verified_online")
+        sources: sources.filter((source) => cited.has(source.id) && source.status === "available_online")
           .map(({ id, title, authority, url, last_checked_at }) => ({ id, title, authority, url, last_checked_at })),
       } }, 200, origin);
     }
@@ -295,7 +295,7 @@ Deno.serve(async (request) => {
       specialist_question: analysis.needs_specialist ? String(analysis.specialist_question || "") : "",
       legal_uncertainty: String(analysis.legal_uncertainty || "Все юридические выводы требуют проверки."),
       sources: sources.filter((source) => Array.isArray(analysis.source_ids) &&
-        analysis.source_ids.includes(source.id) && source.status === "verified_online")
+        analysis.source_ids.includes(source.id) && source.status === "available_online")
         .map(({ id, title, authority, url, last_checked_at }) => ({ id, title, authority, url, last_checked_at })),
     }, matches: [] }, 200, origin);
   } catch (error) {

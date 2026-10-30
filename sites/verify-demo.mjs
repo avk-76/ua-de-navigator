@@ -4,6 +4,40 @@ import { runInNewContext } from "node:vm";
 
 const root = new URL("./dist/", import.meta.url);
 const fixtures = JSON.parse(readFileSync(new URL("demo-fixtures.json", root), "utf8"));
+const familyWindow = {};
+runInNewContext(readFileSync(new URL("family-route.js", root), "utf8"), { window: familyWindow, console });
+const familyRoute = familyWindow.uaDeFamilyRoute;
+const familyAnswers = {
+  stage: "registered", city: "Überlingen", postal_code: "88662", has_ukrainian_fop: true,
+  has_car: "yes", monthly_rent: "", people: [
+    { id: "p1", role: "self", age: "36", citizenship: "ua", arrival_date: "2026-03-27", document: "unknown", insurance: "unknown", revenue: "1500", expenses: "", income_period: "2026-09" },
+    { id: "p2", role: "spouse", age: "34", citizenship: "ua", arrival_date: "2026-03-27", document: "unknown", insurance: "unknown" },
+    { id: "p3", role: "child", age: "3", citizenship: "ua", arrival_date: "2026-03-27", document: "unknown", insurance: "unknown" },
+    { id: "p4", role: "parent", age: "70", citizenship: "ua", arrival_date: "2026-03-27", document: "unknown", insurance: "unknown", care: "yes" },
+  ],
+};
+for (const language of ["ru", "uk", "de", "en"]) {
+  const plan = familyRoute.build(familyAnswers, language);
+  assert.equal(plan.location.district, "Bodenseekreis");
+  assert.equal(plan.people.length, 4);
+  assert.equal(plan.actions.filter((item) => item.id.endsWith(":residence")).length, 4);
+  assert.ok(plan.actions.find((item) => item.id === "p1:sgbii"));
+  assert.ok(plan.actions.find((item) => item.id === "p4:sgbxii"));
+  assert.ok(!plan.actions.find((item) => item.id === "p4:sgbii"));
+  assert.ok(plan.actions.find((item) => item.id === "p3:kindergeld"));
+  assert.ok(plan.actions.find((item) => item.id === "p4:pflegegrad"));
+  assert.equal(plan.urgent.id, "p4:insurance");
+  assert.equal(plan.taxPacket.documented_expenses_eur, null);
+  assert.ok(!JSON.stringify(plan.actions).includes("Landratsamt Konstanz"));
+  assert.ok(!JSON.stringify(plan).includes("Pflegegeld 2"));
+  const unknown = familyRoute.build({ ...familyAnswers, city: "Unbekannt", postal_code: "", people: familyAnswers.people.map((person) => ({ ...person, city: "" })) }, language);
+  assert.equal(unknown.location.known, false);
+  assert.equal(unknown.actions.find((item) => item.id === "p1:residence").source, "directory");
+  assert.ok(!JSON.stringify(unknown.actions).includes("Landratsamt Konstanz"));
+}
+const pendingPlan = familyRoute.build({ ...familyAnswers, people: familyAnswers.people.map((person) => ({ ...person, arrival_date: "2026-05-01" })) }, "ru");
+assert.equal(pendingPlan.actions.find((item) => item.id === "p1:draft").ruleStatus, "draft");
+assert.equal(pendingPlan.actions.find((item) => item.id === "p1:sgbii").effectiveAt, "2026-07-01");
 assert.equal(fixtures.cases.length, 3);
 assert.ok(!JSON.stringify(fixtures).includes("Olena"));
 assert.ok(!JSON.stringify(fixtures).includes("Pototska"));
