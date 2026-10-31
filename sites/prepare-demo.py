@@ -24,7 +24,7 @@ from regional_registry import get_region, list_regions  # noqa: E402
 def main() -> None:
     DIST.mkdir(exist_ok=True)
     for source in PROTOTYPE.iterdir():
-        if source.is_file() and source.suffix in {".html", ".css", ".js"}:
+        if source.is_file() and source.suffix in {".html", ".css", ".js", ".mjs"}:
             shutil.copy2(source, DIST / source.name)
     if (PROTOTYPE / "vendor").is_dir():
         shutil.copytree(PROTOTYPE / "vendor", DIST / "vendor", dirs_exist_ok=True)

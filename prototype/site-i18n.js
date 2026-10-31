@@ -114,7 +114,7 @@
     ["Я проверил(а), что в тексте не осталось личных данных.", "Я перевірив(ла), що в тексті не залишилося особистих даних.", "Ich habe geprüft, dass der Text keine persönlichen Daten mehr enthält.", "I checked that no personal data remains in the text."],
     ["Отмена", "Скасувати", "Abbrechen", "Cancel"],
     ["Передать обезличенный текст", "Передати знеособлений текст", "Anonymisierten Text senden", "Send anonymized text"],
-    ["Файл распознаётся на вашем устройстве. Перед анализом проверьте текст без личных данных.", "Файл розпізнається на вашому пристрої. Перед аналізом перевірте текст без особистих даних.", "Die Datei wird auf Ihrem Gerät erkannt. Prüfen Sie vor der Analyse den Text ohne persönliche Daten.", "The file is recognized on your device. Review the text without personal data before analysis."],
+    ["Сканирование настроено для немецких писем немецких ведомств. Файл распознаётся на вашем устройстве. Перед анализом проверьте текст без личных данных.", "Сканування налаштовано для німецьких листів від німецьких установ. Файл розпізнається на вашому пристрої. Перед аналізом перевірте текст без особистих даних.", "Der Scan ist für deutschsprachige Schreiben deutscher Behörden ausgelegt. Die Datei wird auf Ihrem Gerät erkannt. Prüfen Sie vor der Analyse den Text ohne persönliche Daten.", "Scanning is designed for German-language letters from German authorities. The file is recognized on your device. Review the text without personal data before analysis."],
     ["Кабинет", "Кабінет", "Konto", "Dashboard"],
     ["Мои дела", "Мої справи", "Meine Fälle", "My cases"],
     ["Дела", "Справи", "Fälle", "Cases"],

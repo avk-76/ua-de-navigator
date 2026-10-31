@@ -84,6 +84,12 @@ label {
   margin: 0 auto;
 }
 
+.workspace:has(.document-workspace:not([hidden])) {
+  width: min(1480px, 100%);
+}
+
+html:has(.document-workspace:not([hidden])) { overflow-x: clip; }
+
 .topbar {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -246,6 +252,41 @@ select option {
   grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.75fr);
   gap: 16px;
 }
+
+.document-workspace .input-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 0.28fr);
+}
+
+.document-workspace #documentInput {
+  min-height: clamp(380px, 55vh, 660px);
+  font-family: "Cascadia Code", Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  tab-size: 4;
+}
+
+.scan-report {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid rgba(130, 179, 172, .35);
+  border-radius: 12px;
+  background: rgba(20, 33, 35, .5);
+}
+
+.upload-panel:has(.scan-report) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.upload-panel:has(.scan-report) > :not(#documentInput):not(.scan-report) { grid-column: 1 / -1; }
+.upload-panel:has(.scan-report) #documentInput { grid-column: 1; margin: 0; }
+.upload-panel:has(.scan-report) .scan-report { grid-column: 2; margin: 0; min-width: 0; }
+
+.scan-report h3 { margin: 0 0 8px; }
+.scan-report p { line-height: 1.5; }
+.scan-original { width: 100%; height: min(65vh, 650px); border: 0; object-fit: contain; background: white; }
+.scan-pages { display: grid; gap: 8px; margin-top: 12px; }
+.scan-pages details { border: 1px solid rgba(130, 179, 172, .3); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+.scan-pages summary { cursor: pointer; font-weight: 600; }
+.scan-pages p { margin: 8px 0 0; }
+.scan-report mark { background: #f6d881; color: #302600; padding: 2px 4px; border-radius: 3px; }
+.scan-report .scan-warning { border-left: 3px solid #f6d881; padding-left: 10px; }
 
 .panel,
 .details-panel,
@@ -941,9 +982,14 @@ footer {
   }
 
   .input-grid,
+  .document-workspace .input-grid,
   .result-grid {
     grid-template-columns: 1fr;
   }
+  .upload-panel:has(.scan-report) { grid-template-columns: 1fr; }
+  .upload-panel:has(.scan-report) #documentInput,
+  .upload-panel:has(.scan-report) .scan-report { grid-column: 1; }
+  body:has(.document-workspace:not([hidden])) .ambient-two { right: 0; width: min(24rem, 100vw); }
 
   .summary-grid {
     grid-template-columns: 1fr 1fr;

@@ -826,6 +826,10 @@ fileInput.addEventListener("change", async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
   const t = ui[getLang()];
+  documentInput.value = "";
+  uploadedFileContext = null;
+  documentPreview = null;
+  window.uaDeLocalDocument?.clear();
   try {
     if (!window.uaDeLocalDocument) throw new Error("Локальное распознавание недоступно");
     documentInput.value = await window.uaDeLocalDocument.extract(file, (message) => {
@@ -848,6 +852,7 @@ documentInput.addEventListener("input", () => {
 
 document.querySelectorAll("[data-sample]").forEach((button) => {
   button.addEventListener("click", () => {
+    window.uaDeLocalDocument?.clear();
     documentInput.value = samples[button.dataset.sample] || "";
     statusPill.textContent = ui[getLang()].sampleLoaded(button.textContent);
   });
